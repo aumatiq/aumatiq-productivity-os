@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="bn" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="AUMATIQ Personal Productivity OS — Finance, CRM & Business Intelligence in One App">
+<meta name="theme-color" content="#0A0A0F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F8F9FF" media="(prefers-color-scheme: light)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AUMATIQ OS">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>AUMATIQ — Personal Productivity OS</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   AUMATIQ PERSONAL PRODUCTIVITY OS — Master Stylesheet
+   5-Tab PWA: এন্ট্রি | Dashboard | CRM | Reports | News
+   System Default theme | Brand: #0A0A0F / #4F46E5 / #F5A623
+   ============================================================ */
+
+:root {
+  --bg-primary:    #0A0A0F;
+  --bg-secondary:  #0D1117;
+  --bg-card:       #111118;
+  --bg-input:      #1A1A28;
+  --bg-overlay:    rgba(10, 10, 15, 0.95);
+
+  --indigo:        #4F46E5;
+  --indigo-light:  #6366F1;
+  --indigo-dim:    rgba(79, 70, 229, 0.12);
+  --indigo-border: rgba(79, 70, 229, 0.25);
+  --gold:          #F5A623;
+  --gold-light:    #F8C85D;
+  --gold-dim:      rgba(245, 166, 35, 0.12);
+
+  --text-primary:  #F8F9FF;
+  --text-secondary:#A0A0B0;
+  --text-muted:    #606070;
+
+  --border:        rgba(79, 70, 229, 0.2);
+  --border-focus:  rgba(79, 70, 229, 0.6);
+  --shadow-card:   0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow:   0 0 24px rgba(79, 70, 229, 0.2);
+
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     16px;
+  --radius-xl:     20px;
+
+  --font-display:  'Syne', sans-serif;
+  --font-body:     'Inter', sans-serif;
+
+  --color-expense:  #FF6B6B;
+  --color-income:   #4CAF50;
+  --color-savings:  var(--gold);
+
+  /* CRM stage colors */
+  --stage-new:      #6366F1;
+  --stage-progress: #F5A623;
+  --stage-won:      #4CAF50;
+  --stage-lost:     #606070;
+
+  --transition:    all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --nav-height:    64px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary:    #F5F5F8;
+    --bg-secondary:  #EBEBF0;
+    --bg-card:       #FFFFFF;
+    --bg-input:      #F0F0F5;
+    --bg-overlay:    rgba(245, 245, 248, 0.97);
+
+    --text-primary:  #1A1A2E;
+    --text-secondary:#4A4A5A;
+    --text-muted:    #9090A0;
+
+    --border:        rgba(79, 70, 229, 0.15);
+    --border-focus:  rgba(79, 70, 229, 0.5);
+    --shadow-card:   0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-glow:   0 0 20px rgba(79, 70, 229, 0.1);
+    --indigo-dim:    rgba(79, 70, 229, 0.08);
+    --indigo-border: rgba(79, 70, 229, 0.2);
+    --gold-dim:      rgba(245, 166, 35, 0.08);
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(var(--nav-height) + 12px);
+}
+
+/* ── HEADER ── */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-brand { display: flex; align-items: center; gap: 10px; }
+
+.header-logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--indigo), var(--indigo-light));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.header-title-block { display: flex; flex-direction: column; }
+
+.header-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.header-title span { color: var(--gold); }
+
+.header-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.header-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: right;
+  line-height: 1.4;
+}
+
+/* ── MAIN CONTENT WRAPPER ── */
+.app-main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 18px 16px 24px;
+}
+
+.tab-page { display: none; }
+.tab-page.active { display: block; animation: fadeInUp 0.3s ease; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--indigo-light);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* ── BOTTOM TAB NAVIGATION ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: var(--nav-height);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 0;
+  transition: var(--transition);
+  -webkit-appearance: none;
+  position: relative;
+}
+
+.nav-btn .nav-icon { font-size: 20px; line-height: 1; transition: var(--transition); }
+.nav-btn .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; }
+
+.nav-btn.active { color: var(--indigo-light); }
+.nav-btn.active .nav-icon { transform: translateY(-2px); }
+
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 28px;
+  height: 3px;
+  background: linear-gradient(135deg, var(--indigo), var(--gold));
+  border-radius: 0 0 4px 4px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 22px 18px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 16px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── SMALL UTILITY BUTTON ── */
+.btn-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--indigo-light);
+  background: var(--indigo-dim);
+  border: 1px solid var(--indigo-border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  -webkit-appearance: none;
+}
+.btn-chip:hover { background: rgba(79,70,229,0.22); }
+.btn-chip.gold { color: var(--gold); background: var(--gold-dim); border-color: rgba(245,166,35,0.3); }
+
+/* ── OFFLINE BANNER ── */
+.offline-banner {
+  background: rgba(245, 166, 35, 0.1);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--gold);
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.offline-banner.show { display: flex; }
+
+/* ============================================================
+   FORM SYSTEM — reused across এন্ট্রি, CRM add/edit forms
+   ============================================================ */
+
+.form-group { margin-bottom: 16px; }
+.form-group:last-child { margin-bottom: 0; }
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 7px;
+  letter-spacing: 0.3px;
+}
+.form-label .required-star { color: var(--color-expense); margin-left: 3px; }
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px; /* iOS zoom fix */
+  font-weight: 400;
+  padding: 13px 14px;
+  outline: none;
+  transition: var(--transition);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  background: var(--bg-secondary);
+}
+
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+.form-select option { color: #000000; background: #ffffff; }
+
+.amount-wrapper { position: relative; }
+.amount-prefix {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-display); font-size: 18px; font-weight: 700;
+  color: var(--gold); pointer-events: none; z-index: 1;
+}
+.amount-input {
+  padding-left: 34px !important;
+  font-family: var(--font-display) !important;
+  font-size: 24px !important; font-weight: 700 !important;
+  color: var(--text-primary) !important; letter-spacing: -0.5px;
+}
+
+.select-wrapper { position: relative; }
+.select-arrow {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-top: 6px solid var(--text-muted); pointer-events: none; z-index: 1;
+}
+.form-select { padding-right: 40px; cursor: pointer; }
+
+.form-textarea { resize: none; min-height: 70px; line-height: 1.6; }
+
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-currency { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
+
+.category-manage-link {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--indigo-light); font-weight: 600;
+  cursor: pointer; margin-top: 6px; text-decoration: none; transition: var(--transition);
+}
+.category-manage-link:hover { color: var(--gold); }
+
+.field-error {
+  font-size: 12px; color: var(--color-expense); margin-top: 5px; display: none; font-weight: 500;
+}
+.field-error.show { display: block; }
+.form-input.error, .form-select.error, .form-textarea.error {
+  border-color: rgba(255, 107, 107, 0.6);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+.form-divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+/* ── TYPE SELECTOR (এন্ট্রি tab) ── */
+.type-selector {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;
+}
+.type-btn {
+  padding: 14px 8px; border-radius: var(--radius-md); border: 1.5px solid var(--border);
+  background: var(--bg-card); color: var(--text-secondary); font-family: var(--font-body);
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  text-align: center; -webkit-appearance: none;
+}
+.type-btn .type-icon { font-size: 20px; line-height: 1; }
+.type-btn:hover { border-color: var(--indigo-border); color: var(--text-primary); }
+.type-btn.active-expense {
+  background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.5);
+  color: var(--color-expense); box-shadow: 0 4px 16px rgba(255,107,107,0.15);
+}
+.type-btn.active-income {
+  background: rgba(76,175,80,0.1); border-color: rgba(76,175,80,0.5);
+  color: var(--color-income); box-shadow: 0 4px 16px rgba(76,175,80,0.15);
+}
+.type-btn.active-savings {
+  background: var(--gold-dim); border-color: rgba(245,166,35,0.5);
+  color: var(--gold); box-shadow: 0 4px 16px rgba(245,166,35,0.15);
+}
+
+.field-expense, .field-income, .field-savings,
+.field-note-expense, .field-note-income, .field-note-savings { display: none; }
+.show-expense .field-expense, .show-expense .field-note-expense { display: block; }
+.show-income .field-income, .show-income .field-note-income { display: block; }
+.show-savings .field-savings, .show-savings .field-note-savings { display: block; }
+
+/* ── SUBMIT BUTTON ── */
+.btn-submit {
+  width: 100%; padding: 16px 24px;
+  background: linear-gradient(135deg, var(--indigo), var(--indigo-light));
+  color: #fff; font-family: var(--font-body); font-size: 15px; font-weight: 700;
+  border: none; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 18px; letter-spacing: 0.3px; min-height: 54px; -webkit-appearance: none;
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(79,70,229,0.35); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-submit.loading .btn-text { display: none; }
+.btn-submit.loading .btn-spinner { display: block; }
+.btn-spinner { display: none; }
+
+.btn-secondary-full {
+  width: 100%; padding: 14px; background: transparent; border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); color: var(--text-primary); font-family: var(--font-body);
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition);
+  margin-top: 10px; -webkit-appearance: none;
+}
+.btn-secondary-full:hover { border-color: var(--indigo-border); background: var(--indigo-dim); }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-circle {
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+
+/* ============================================================
+   REVIEW SCREEN OVERLAY (এন্ট্রি submit করার আগে)
+   ============================================================ */
+
+.review-overlay {
+  position: fixed; inset: 0; z-index: 400; background: var(--bg-overlay);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: flex-end; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.review-overlay.show { opacity: 1; pointer-events: all; }
+
+.review-sheet {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 28px 20px 32px;
+  width: 100%; max-width: 560px; margin: 0 auto;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 85vh; overflow-y: auto;
+}
+.review-overlay.show .review-sheet { transform: translateY(0); }
+
+.review-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 22px; }
+.review-title { font-family: var(--font-display); font-size: 19px; font-weight: 700; margin-bottom: 18px; color: var(--text-primary); }
+
+.review-amount-block {
+  background: var(--indigo-dim); border: 1px solid var(--indigo-border);
+  border-radius: var(--radius-md); padding: 18px; text-align: center; margin-bottom: 18px;
+}
+.review-amount-label {
+  font-size: 11px; color: var(--text-secondary); font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; display: block;
+}
+.review-amount-value { font-family: var(--font-display); font-size: 38px; font-weight: 800; color: var(--gold); letter-spacing: -1px; line-height: 1; }
+.review-amount-value .currency { font-size: 22px; vertical-align: top; margin-top: 6px; display: inline-block; }
+
+.review-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+.review-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.review-item:last-child { border-bottom: none; }
+.review-item-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; min-width: 80px; flex-shrink: 0; }
+.review-item-value { font-size: 14px; color: var(--text-primary); font-weight: 500; text-align: right; word-break: break-word; }
+
+.type-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.type-badge.expense { background: rgba(255,107,107,0.12); color: var(--color-expense); }
+.type-badge.income { background: rgba(76,175,80,0.12); color: var(--color-income); }
+.type-badge.savings { background: var(--gold-dim); color: var(--gold); }
+
+.review-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn-review-edit {
+  padding: 14px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  color: var(--text-primary); font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); -webkit-appearance: none;
+}
+.btn-review-edit:hover { border-color: var(--indigo-border); background: var(--indigo-dim); }
+.btn-review-confirm {
+  padding: 14px; background: linear-gradient(135deg, var(--indigo), var(--indigo-light)); border: none;
+  border-radius: var(--radius-md); color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: var(--transition); -webkit-appearance: none;
+}
+.btn-review-confirm:hover { box-shadow: 0 8px 24px rgba(79,70,229,0.35); transform: translateY(-1px); }
+.btn-review-confirm:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ============================================================
+   TOAST NOTIFICATION (global — সব tab থেকে accessible)
+   ============================================================ */
+
+.toast-container {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 500;
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+  width: calc(100% - 32px); max-width: 400px;
+}
+.toast {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 18px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-card);
+  animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; pointer-events: all;
+}
+.toast.removing { animation: toastOut 0.25s ease forwards; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-16px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-8px) scale(0.97); } }
+.toast-icon { font-size: 20px; flex-shrink: 0; }
+.toast-body { flex: 1; }
+.toast-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.toast-msg { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+.toast.success { border-left: 3px solid var(--color-income); }
+.toast.error { border-left: 3px solid var(--color-expense); }
+.toast.warning { border-left: 3px solid var(--gold); }
+.toast.info { border-left: 3px solid var(--indigo); }
+
+/* ============================================================
+   MODAL (Category Manager + CRM Quick-Add/Edit)
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 450; background: rgba(10,10,15,0.8); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl);
+  padding: 24px 20px; width: 100%; max-width: 420px; max-height: 80vh;
+  display: flex; flex-direction: column; box-shadow: var(--shadow-card);
+  transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.show .modal-box { transform: scale(1); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-input);
+  color: var(--text-secondary); cursor: pointer; font-size: 16px; display: flex; align-items: center;
+  justify-content: center; transition: var(--transition); flex-shrink: 0;
+}
+.modal-close:hover { background: var(--indigo-dim); color: var(--text-primary); }
+.modal-body { overflow-y: auto; flex: 1; }
+
+.category-list-modal { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.category-item-modal {
+  display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
+  background: var(--bg-input); border-radius: var(--radius-sm); font-size: 14px;
+}
+.category-item-modal span { flex: 1; }
+.cat-delete-btn {
+  background: none; border: none; color: var(--color-expense); cursor: pointer; font-size: 16px;
+  padding: 4px 6px; border-radius: 4px; transition: var(--transition);
+}
+.cat-delete-btn:hover { background: rgba(255,107,107,0.1); }
+
+.add-category-row { display: flex; gap: 8px; margin-top: 8px; }
+.add-category-input {
+  flex: 1; background: var(--bg-input); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-family: var(--font-body); font-size: 15px; padding: 10px 12px; outline: none;
+}
+.add-category-input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.add-category-btn {
+  padding: 10px 16px; background: var(--indigo); color: #fff; border: none; border-radius: var(--radius-sm);
+  font-weight: 700; cursor: pointer; font-size: 18px; transition: var(--transition); -webkit-appearance: none;
+}
+.add-category-btn:hover { background: var(--indigo-light); }
+
+/* ============================================================
+   DASHBOARD TAB
+   ============================================================ */
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+
+.stat-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 16px 14px; position: relative; overflow: hidden;
+}
+.stat-box.wide { grid-column: 1 / -1; }
+.stat-box-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; }
+.stat-box-value { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
+.stat-box-value.income { color: var(--color-income); }
+.stat-box-value.expense { color: var(--color-expense); }
+.stat-box-value.gold { color: var(--gold); }
+.stat-box-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.progress-track {
+  height: 6px; background: var(--bg-input); border-radius: 3px; overflow: hidden; margin-top: 10px;
+}
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
+.progress-fill.indigo { background: linear-gradient(90deg, var(--indigo), var(--indigo-light)); }
+.progress-fill.gold { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.progress-fill.danger { background: linear-gradient(90deg, var(--color-expense), #FF8A8A); }
+
+.cat-breakdown-row {
+  display: flex; align-items: center; justify-content: space-between; padding: 10px 0;
+  border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.cat-breakdown-row:last-child { border-bottom: none; }
+.cat-breakdown-name { color: var(--text-primary); font-weight: 500; }
+.cat-breakdown-amount { color: var(--text-secondary); font-weight: 600; }
+
+.net-balance-banner {
+  border-radius: var(--radius-lg); padding: 18px; text-align: center; margin-bottom: 16px;
+}
+.net-balance-banner.positive { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.3); }
+.net-balance-banner.negative { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); }
+.net-balance-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 6px; }
+.net-balance-value { font-family: var(--font-display); font-size: 30px; font-weight: 800; }
+.net-balance-banner.positive .net-balance-value { color: var(--color-income); }
+.net-balance-banner.negative .net-balance-value { color: var(--color-expense); }
+
+/* ============================================================
+   CRM TAB — Clients / Pipeline / Projects
+   ============================================================ */
+
+.crm-subtabs { display: flex; gap: 8px; margin-bottom: 18px; background: var(--bg-input); border-radius: var(--radius-md); padding: 4px; }
+.crm-subtab-btn {
+  flex: 1; padding: 10px 8px; border-radius: 8px; border: none; background: transparent;
+  color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: var(--transition); -webkit-appearance: none;
+}
+.crm-subtab-btn.active { background: var(--indigo); color: #fff; box-shadow: 0 2px 12px rgba(79,70,229,0.3); }
+
+.crm-list { display: flex; flex-direction: column; gap: 10px; }
+
+.crm-item-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 16px; cursor: pointer; transition: var(--transition);
+}
+.crm-item-card:hover { border-color: var(--indigo-border); }
+.crm-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.crm-item-name { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.crm-item-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.crm-item-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.crm-item-value { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--gold); }
+
+.status-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.status-pill.active { background: rgba(76,175,80,0.12); color: var(--color-income); }
+.status-pill.paused { background: rgba(245,166,35,0.12); color: var(--gold); }
+.status-pill.churned { background: rgba(255,107,107,0.12); color: var(--color-expense); }
+.status-pill.healthy { background: rgba(76,175,80,0.12); color: var(--color-income); }
+.status-pill.atrisk { background: rgba(245,166,35,0.12); color: var(--gold); }
+.status-pill.critical { background: rgba(255,107,107,0.12); color: var(--color-expense); }
+
+.stage-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.stage-pill.new { background: rgba(99,102,241,0.12); color: var(--stage-new); }
+.stage-pill.contacted { background: rgba(99,102,241,0.12); color: var(--stage-new); }
+.stage-pill.demosent { background: rgba(245,166,35,0.12); color: var(--stage-progress); }
+.stage-pill.negotiating { background: rgba(245,166,35,0.12); color: var(--stage-progress); }
+.stage-pill.won { background: rgba(76,175,80,0.12); color: var(--stage-won); }
+.stage-pill.lost { background: rgba(96,96,112,0.2); color: var(--stage-lost); }
+
+.empty-state {
+  text-align: center; padding: 40px 20px; color: var(--text-muted);
+}
+.empty-state-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.5; }
+.empty-state-text { font-size: 13px; }
+
+.fab-add {
+  position: fixed; bottom: calc(var(--nav-height) + 20px); right: 20px; z-index: 150;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--indigo), var(--indigo-light));
+  color: #fff; border: none; font-size: 26px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(79,70,229,0.4); cursor: pointer; transition: var(--transition);
+  -webkit-appearance: none;
+}
+.fab-add:hover { transform: scale(1.08); }
+.fab-add:active { transform: scale(0.96); }
+
+/* ============================================================
+   REPORTS TAB
+   ============================================================ */
+
+.month-selector {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 16px;
+}
+.month-nav-btn {
+  background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary);
+  width: 36px; height: 36px; border-radius: 8px; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: var(--transition);
+  -webkit-appearance: none;
+}
+.month-nav-btn:hover { background: var(--indigo-dim); border-color: var(--indigo-border); }
+.month-label { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
+
+.bar-chart-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.bar-chart-label { font-size: 12px; color: var(--text-secondary); width: 70px; flex-shrink: 0; }
+.bar-chart-track { flex: 1; height: 22px; background: var(--bg-input); border-radius: 6px; overflow: hidden; position: relative; }
+.bar-chart-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; transition: width 0.7s cubic-bezier(0.16,1,0.3,1); }
+.bar-chart-fill span { font-size: 10px; font-weight: 700; color: #fff; }
+
+.history-row {
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.history-row:last-child { border-bottom: none; }
+.history-month { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.history-figures { display: flex; gap: 14px; font-size: 12px; }
+.history-figures .hf-income { color: var(--color-income); }
+.history-figures .hf-expense { color: var(--color-expense); }
+.history-figures .hf-net { font-weight: 700; }
+
+/* ============================================================
+   NEWS TAB (placeholder — Part 3 এ active হবে)
+   ============================================================ */
+
+.news-placeholder {
+  text-align: center; padding: 60px 24px;
+}
+.news-placeholder-icon {
+  width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 20px;
+  background: var(--gold-dim); border: 1px solid rgba(245,166,35,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 32px;
+}
+.news-placeholder-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.news-placeholder-text { font-size: 13px; color: var(--text-secondary); line-height: 1.7; max-width: 320px; margin: 0 auto; }
+.news-placeholder-badge {
+  display: inline-block; margin-top: 16px; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--gold); background: var(--gold-dim);
+  border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 6px 14px;
+}
+
+/* ── NEWS CARDS (Part 3 — real content) ── */
+.news-section-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px; margin-top: 4px;
+}
+.news-section-icon { font-size: 16px; }
+.news-section-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text-primary); }
+
+.news-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 16px; margin-bottom: 10px; transition: var(--transition);
+}
+.news-card:hover { border-color: var(--indigo-border); }
+.news-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; margin-bottom: 8px; }
+.news-card-footer { display: flex; align-items: center; justify-content: space-between; }
+.news-card-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--indigo-light); background: var(--indigo-dim); border-radius: 10px; padding: 3px 8px;
+}
+.news-card-link {
+  font-size: 12px; font-weight: 600; color: var(--gold); text-decoration: none; transition: var(--transition);
+}
+.news-card-link:hover { color: var(--gold-light); }
+
+.news-updated-note {
+  text-align: center; font-size: 11px; color: var(--text-muted); margin: 16px 0 4px;
+}
+.news-refresh-btn-row { text-align: center; margin-top: 8px; }
+
+/* ── Footer note ── */
+.app-footer-note {
+  text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px; padding: 0 20px; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HEADER                                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<header class="app-header">
+  <div class="header-brand">
+    <div class="header-logo">A</div>
+    <div class="header-title-block">
+      <span class="header-title">AUMATIQ<span>.</span>OS</span>
+      <span class="header-subtitle" id="pageHeaderSubtitle">এন্ট্রি</span>
+    </div>
+  </div>
+  <div class="header-time" id="headerClock">--/--/---- --:--</div>
+</header>
+
+<!-- Offline banner — সব tab-এর জন্য shared -->
+<div class="app-main" style="padding-bottom: 0; padding-top: 14px;">
+  <div class="offline-banner" id="offlineBanner">
+    📡 <span>Offline — Internet সংযোগ হলে entry automatically sync হবে</span>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<main class="app-main">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TAB 1 — এন্ট্রি (Income / Expense / Savings)              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <section class="tab-page active" id="page-entry">
+    <span class="section-label">নতুন এন্ট্রি</span>
+    <h1 class="page-title">কী যুক্ত করবে?</h1>
+    <p class="page-subtitle">খরচ, আয়, বা সঞ্চয় — এক ট্যাপে এন্ট্রি দাও</p>
+
+    <div class="type-selector" id="typeSelector">
+      <button type="button" class="type-btn" data-type="খরচ" id="btnTypeExpense">
+        <span class="type-icon">💸</span><span>খরচ</span>
+      </button>
+      <button type="button" class="type-btn" data-type="আয়" id="btnTypeIncome">
+        <span class="type-icon">💰</span><span>আয়</span>
+      </button>
+      <button type="button" class="type-btn" data-type="সঞ্চয়" id="btnTypeSavings">
+        <span class="type-icon">🏦</span><span>সঞ্চয়</span>
+      </button>
+    </div>
+
+    <form id="entryForm" class="card" novalidate>
+
+      <!-- Amount + Currency -->
+      <div class="form-group">
+        <label class="form-label">পরিমাণ<span class="required-star">*</span></label>
+        <div class="form-row-currency">
+          <div class="amount-wrapper">
+            <span class="amount-prefix" id="currencyPrefix">৳</span>
+            <input type="number" inputmode="decimal" class="form-input amount-input" id="entryAmount"
+                   placeholder="0" min="1" step="0.01" required>
+          </div>
+          <div class="select-wrapper">
+            <select class="form-select" id="entryCurrency">
+              <option value="BDT" selected>BDT (৳)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+        <div class="field-error" id="errAmount">পরিমাণ সঠিকভাবে লিখো (শূন্যের চেয়ে বেশি)</div>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label class="form-label">ক্যাটাগরি<span class="required-star">*</span></label>
+        <div class="select-wrapper">
+          <select class="form-select" id="entryCategory" required>
+            <!-- options dynamically populated by JS based on selected type -->
+          </select>
+          <span class="select-arrow"></span>
+        </div>
+        <span class="category-manage-link" id="manageCategoryLink">⚙️ ক্যাটাগরি add/remove করো</span>
+        <div class="field-error" id="errCategory">একটি ক্যাটাগরি বেছে নাও</div>
+      </div>
+
+      <!-- Date -->
+      <div class="form-group">
+        <label class="form-label">তারিখ<span class="required-star">*</span></label>
+        <input type="date" class="form-input" id="entryDate" required>
+      </div>
+
+      <div class="form-row-2">
+        <!-- Payment Method -->
+        <div class="form-group">
+          <label class="form-label">Payment Method<span class="required-star">*</span></label>
+          <div class="select-wrapper">
+            <select class="form-select" id="entryPayment" required>
+              <option value="Cash">Cash</option>
+              <option value="bKash">bKash</option>
+              <option value="Nagad">Nagad</option>
+              <option value="Rocket">Rocket</option>
+              <option value="Bank">Bank</option>
+              <option value="Card">Card</option>
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+
+        <!-- Member -->
+        <div class="form-group">
+          <label class="form-label">Member<span class="required-star">*</span></label>
+          <div class="select-wrapper">
+            <select class="form-select" id="entryMember" required>
+              <option value="AUMATIQ Admin">AUMATIQ Admin</option>
+              <option value="Faisal BK">Faisal BK</option>
+              <option value="Tanzina BK">Tanzina BK</option>
+              <option value="Team Member 1">Team Member 1</option>
+              <option value="Team Member 2">Team Member 2</option>
+              <option value="Team Member 3">Team Member 3</option>
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Link (income only — optional) -->
+      <div class="form-group field-income">
+        <label class="form-label">কোন Client থেকে এই আয়? (Optional)</label>
+        <div class="select-wrapper">
+          <select class="form-select" id="entryClientLink">
+            <option value="">— নির্বাচন করো (optional) —</option>
+            <!-- populated by JS from CLIENTS sheet data passed at load -->
+          </select>
+          <span class="select-arrow"></span>
+        </div>
+      </div>
+
+      <!-- Dynamic note fields — প্রতিটি আলাদা নাম, কোনোটার সাথে কোনোটা মিলবে না -->
+      <div class="form-group field-note-expense">
+        <label class="form-label">খরচের বিবরণ</label>
+        <textarea class="form-textarea" id="noteExpenseField" placeholder="কী কিনলে / কোথায় খরচ হলো..."></textarea>
+      </div>
+      <div class="form-group field-note-income">
+        <label class="form-label">আয়ের উৎস বিস্তারিত</label>
+        <textarea class="form-textarea" id="noteIncomeField" placeholder="কোন client/সোর্স থেকে এই আয়..."></textarea>
+      </div>
+      <div class="form-group field-note-savings">
+        <label class="form-label">সঞ্চয়ের লক্ষ্য</label>
+        <textarea class="form-textarea" id="noteSavingsField" placeholder="এই সঞ্চয়টা কী উদ্দেশ্যে..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="entrySubmitBtn">
+        <span class="btn-text">✓ এন্ট্রি Review করো</span>
+        <span class="btn-spinner"><span class="spinner-circle"></span></span>
+      </button>
+    </form>
+
+    <p class="app-footer-note">সব এন্ট্রি Google Sheets-এ নিরাপদে সংরক্ষিত হয়। AUMATIQ Personal Productivity OS v1.0</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TAB 2 — DASHBOARD                                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <section class="tab-page" id="page-dashboard">
+    <span class="section-label">এই মাসের সারসংক্ষেপ</span>
+    <h1 class="page-title" id="dashboardMonthLabel">জুন ২০২৬</h1>
+    <p class="page-subtitle">সব হিসাব BDT সমমূল্যে দেখানো হচ্ছে (USD আয় auto-converted)</p>
+
+    <div class="net-balance-banner positive" id="netBalanceBanner">
+      <div class="net-balance-label">নেট ব্যালেন্স (আয় − খরচ − সঞ্চয়)</div>
+      <div class="net-balance-value" id="netBalanceValue">৳0</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-box-label">💰 মোট আয়</div>
+        <div class="stat-box-value income" id="statTotalIncome">৳0</div>
+        <div class="progress-track"><div class="progress-fill indigo" id="incomeGoalBar" style="width:0%"></div></div>
+        <div class="stat-box-sub" id="incomeGoalText">Goal-এর ০% অর্জিত</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-label">💸 মোট খরচ</div>
+        <div class="stat-box-value expense" id="statTotalExpense">৳0</div>
+        <div class="progress-track"><div class="progress-fill danger" id="expenseBudgetBar" style="width:0%"></div></div>
+        <div class="stat-box-sub" id="expenseBudgetText">বাজেটের ০% ব্যবহৃত</div>
+      </div>
+      <div class="stat-box wide">
+        <div class="stat-box-label">🏦 মোট সঞ্চয়</div>
+        <div class="stat-box-value gold" id="statTotalSavings">৳0</div>
+        <div class="stat-box-sub" id="savingsRateText">Savings Rate: ০%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">💸 খরচের ক্যাটাগরি</span></div>
+      <div id="expenseCategoryBreakdown">
+        <div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এই মাসে কোনো খরচের এন্ট্রি নেই</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">💰 আয়ের ক্যাটাগরি</span></div>
+      <div id="incomeCategoryBreakdown">
+        <div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এই মাসে কোনো আয়ের এন্ট্রি নেই</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🏢 AUMATIQ Pipeline Snapshot</span>
+        <button class="btn-chip" onclick="switchTab('crm')">CRM দেখো →</button>
+      </div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">Active Clients</span><span class="cat-breakdown-amount" id="dashActiveClients">0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">Monthly Recurring Revenue</span><span class="cat-breakdown-amount" id="dashMRR">৳0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">Open Leads</span><span class="cat-breakdown-amount" id="dashOpenLeads">0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">Pipeline Value</span><span class="cat-breakdown-amount" id="dashPipelineValue">৳0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">⚠️ At Risk / Critical Clients</span><span class="cat-breakdown-amount" id="dashAtRisk">0</span></div>
+    </div>
+
+    <button class="btn-secondary-full" id="refreshDashboardBtn">🔄 Dashboard Refresh করো</button>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TAB 3 — CRM (Clients / Pipeline / Projects)              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <section class="tab-page" id="page-crm">
+    <span class="section-label">AUMATIQ CRM</span>
+    <h1 class="page-title">Clients, Leads &amp; Projects</h1>
+    <p class="page-subtitle">পুরো business pipeline এক জায়গায় — client দেখানোর জন্য এই অংশটা ব্যবহার করো</p>
+
+    <div class="crm-subtabs">
+      <button class="crm-subtab-btn active" data-crmtab="clients">👥 Clients</button>
+      <button class="crm-subtab-btn" data-crmtab="pipeline">🎯 Pipeline</button>
+      <button class="crm-subtab-btn" data-crmtab="projects">📋 Projects</button>
+    </div>
+
+    <!-- CLIENTS list -->
+    <div class="crm-subpage active" id="crm-clients">
+      <div class="crm-list" id="clientsList">
+        <div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">এখনো কোনো client যুক্ত হয়নি।<br>নিচের + বাটনে ট্যাপ করে প্রথম client যুক্ত করো।</div></div>
+      </div>
+    </div>
+
+    <!-- PIPELINE list -->
+    <div class="crm-subpage" id="crm-pipeline" style="display:none;">
+      <div class="crm-list" id="pipelineList">
+        <div class="empty-state"><div class="empty-state-icon">🎯</div><div class="empty-state-text">এখনো কোনো lead যুক্ত হয়নি।<br>নিচের + বাটনে ট্যাপ করে প্রথম lead যুক্ত করো।</div></div>
+      </div>
+    </div>
+
+    <!-- PROJECTS list -->
+    <div class="crm-subpage" id="crm-projects" style="display:none;">
+      <div class="crm-list" id="projectsList">
+        <div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">এখনো কোনো project যুক্ত হয়নি।<br>একটি client active হওয়ার পর project যুক্ত করো।</div></div>
+      </div>
+    </div>
+  </section>
+
+  <button class="fab-add" id="crmFabAdd" style="display:none;">+</button>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TAB 4 — REPORTS                                          -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <section class="tab-page" id="page-reports">
+    <span class="section-label">মাসিক রিপোর্ট</span>
+    <h1 class="page-title">P&amp;L History</h1>
+    <p class="page-subtitle">মাস বদলে আগের performance দেখো</p>
+
+    <div class="month-selector">
+      <button class="month-nav-btn" id="reportPrevMonth">‹</button>
+      <span class="month-label" id="reportMonthLabel">জুন ২০২৬</span>
+      <button class="month-nav-btn" id="reportNextMonth">›</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Income vs Expense vs Savings</span></div>
+      <div id="reportBarChart">
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">আয়</span>
+          <div class="bar-chart-track"><div class="bar-chart-fill" id="barIncome" style="width:0%;background:linear-gradient(90deg,#4CAF50,#6FCF73);"><span id="barIncomeVal"></span></div></div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">খরচ</span>
+          <div class="bar-chart-track"><div class="bar-chart-fill" id="barExpense" style="width:0%;background:linear-gradient(90deg,#FF6B6B,#FF8A8A);"><span id="barExpenseVal"></span></div></div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">সঞ্চয়</span>
+          <div class="bar-chart-track"><div class="bar-chart-fill" id="barSavings" style="width:0%;background:linear-gradient(90deg,#F5A623,#F8C85D);"><span id="barSavingsVal"></span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">📈 সাম্প্রতিক ৬ মাসের ইতিহাস</span></div>
+      <div id="historyList">
+        <div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">পর্যাপ্ত ডেটা এখনো নেই</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">🏢 CRM Business Health</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">এই মাসে নতুন Client</span><span class="cat-breakdown-amount" id="reportNewClients">0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">এই মাসে Won Deals</span><span class="cat-breakdown-amount" id="reportWonDeals">0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">Active Projects</span><span class="cat-breakdown-amount" id="reportActiveProjects">0</span></div>
+      <div class="cat-breakdown-row"><span class="cat-breakdown-name">গড় Client Health</span><span class="cat-breakdown-amount" id="reportAvgHealth">—</span></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TAB 5 — NEWS / BRIEFING (Part 3 — live RSS content)      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <section class="tab-page" id="page-news">
+    <span class="section-label">News Briefing</span>
+    <h1 class="page-title">Daily Briefing</h1>
+    <p class="page-subtitle">আন্তর্জাতিক, বাংলাদেশ ও তোমার ইন্টারেস্ট-ভিত্তিক news এক জায়গায়</p>
+
+    <div id="newsLoadingState" class="card" style="text-align:center; padding: 40px 20px;">
+      <div class="spinner-circle" style="border-top-color: var(--indigo); margin: 0 auto 14px;"></div>
+      <p style="font-size:13px; color: var(--text-secondary);">News আনা হচ্ছে...</p>
+    </div>
+
+    <div id="newsContentState" style="display:none;">
+      <div class="news-section-header"><span class="news-section-icon">🌍</span><span class="news-section-title">আন্তর্জাতিক</span></div>
+      <div id="newsInternational"></div>
+
+      <div class="news-section-header"><span class="news-section-icon">🇧🇩</span><span class="news-section-title">বাংলাদেশ</span></div>
+      <div id="newsBangladesh"></div>
+
+      <div class="news-section-header"><span class="news-section-icon">⭐</span><span class="news-section-title" id="newsInterestTitle">তোমার ইন্টারেস্ট</span></div>
+      <div id="newsInterest"></div>
+
+      <p class="news-updated-note" id="newsUpdatedNote">সর্বশেষ আপডেট: —</p>
+    </div>
+
+    <div id="newsErrorState" class="card news-placeholder" style="display:none;">
+      <div class="news-placeholder-icon">📡</div>
+      <div class="news-placeholder-title">News এখনো প্রস্তুত হয়নি</div>
+      <div class="news-placeholder-text" id="newsErrorText">
+        Apps Script-এ refreshNewsCache() একবার manually run করো, অথবা সকাল ৭টার
+        trigger-এর জন্য অপেক্ষা করো।
+      </div>
+    </div>
+
+    <div class="news-refresh-btn-row">
+      <button class="btn-secondary-full" id="refreshNewsBtn" style="margin-top:4px;">🔄 News আবার লোড করো</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BOTTOM NAVIGATION                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="entry">
+    <span class="nav-icon">✍️</span><span class="nav-label">এন্ট্রি</span>
+  </button>
+  <button class="nav-btn" data-tab="dashboard">
+    <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span>
+  </button>
+  <button class="nav-btn" data-tab="crm">
+    <span class="nav-icon">🏢</span><span class="nav-label">CRM</span>
+  </button>
+  <button class="nav-btn" data-tab="reports">
+    <span class="nav-icon">📈</span><span class="nav-label">Reports</span>
+  </button>
+  <button class="nav-btn" data-tab="news">
+    <span class="nav-icon">📰</span><span class="nav-label">News</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- REVIEW OVERLAY — এন্ট্রি submit করার আগে confirm screen      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="review-overlay" id="reviewOverlay">
+  <div class="review-sheet">
+    <div class="review-handle"></div>
+    <h3 class="review-title">এন্ট্রি নিশ্চিত করো</h3>
+
+    <div class="review-amount-block">
+      <span class="review-amount-label" id="reviewTypeLabel">খরচ</span>
+      <div class="review-amount-value">
+        <span class="currency" id="reviewCurrencySymbol">৳</span><span id="reviewAmountValue">0</span>
+      </div>
+    </div>
+
+    <div class="review-items" id="reviewItemsList">
+      <!-- populated dynamically by JS -->
+    </div>
+
+    <div class="review-actions">
+      <button class="btn-review-edit" id="reviewEditBtn">✏️ এডিট করুন</button>
+      <button class="btn-review-confirm" id="reviewConfirmBtn">✓ নিশ্চিত করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- CATEGORY MANAGER MODAL                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="modal-overlay" id="categoryModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="categoryModalTitle">খরচের ক্যাটাগরি</span>
+      <button class="modal-close" id="categoryModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="category-list-modal" id="categoryListModal"></div>
+      <div class="add-category-row">
+        <input type="text" class="add-category-input" id="newCategoryInput" placeholder="নতুন ক্যাটাগরির নাম...">
+        <button class="add-category-btn" id="addCategoryBtn">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- CRM QUICK-ADD MODAL — Client / Pipeline / Project (shared shell, content swapped by JS) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="modal-overlay" id="crmAddModal">
+  <div class="modal-box" style="max-width: 480px;">
+    <div class="modal-header">
+      <span class="modal-title" id="crmModalTitle">নতুন Client যুক্ত করো</span>
+      <button class="modal-close" id="crmModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- CLIENT form -->
+      <form id="clientAddForm" class="crm-form" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Client Name<span class="required-star">*</span></label>
+          <input type="text" class="form-input" id="cliName" required placeholder="যেমন: Bright Smile Dental">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Business Type<span class="required-star">*</span></label>
+            <input type="text" class="form-input" id="cliType" required placeholder="Dental / School / HVAC">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country<span class="required-star">*</span></label>
+            <div class="select-wrapper">
+              <select class="form-select" id="cliCountry" required>
+                <option value="Bangladesh">Bangladesh</option>
+                <option value="USA">USA</option>
+                <option value="UK">UK</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service<span class="required-star">*</span></label>
+          <div class="select-wrapper">
+            <select class="form-select" id="cliService" required>
+              <option value="School Management ERP">BD-1 · School Management ERP</option>
+              <option value="Clinic & Doctor Automation">BD-2 · Clinic Automation</option>
+              <option value="Local Business WhatsApp Automation">BD-3 · WhatsApp Automation</option>
+              <option value="AI Website + SEO Content System">BD-4 · Website + SEO</option>
+              <option value="Personal Productivity Automation">BD-5 · Productivity Automation</option>
+              <option value="Dental Practice Automation">GL-1 · Dental Automation</option>
+              <option value="Healthcare & Med Spa Automation">GL-2 · Healthcare Automation</option>
+              <option value="Home Service Business Automation">GL-3 · Home Service Automation</option>
+              <option value="AI Voice Agent">GL-4 · AI Voice Agent</option>
+              <option value="Real Estate Lead Automation">GL-5 · Real Estate Automation</option>
+              <option value="E-commerce Automation">GL-6 · E-commerce Automation</option>
+              <option value="Google Review Automation">GL-7 · Review Automation</option>
+              <option value="AI Content Repurposing">GL-8 · Content Repurposing</option>
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status<span class="required-star">*</span></label>
+          <div class="select-wrapper">
+            <select class="form-select" id="cliStatus" required>
+              <option value="Active">Active</option>
+              <option value="Paused">Paused</option>
+              <option value="Churned">Churned</option>
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+        <div class="form-row-currency">
+          <div class="form-group">
+            <label class="form-label">Setup Fee</label>
+            <input type="number" class="form-input" id="cliSetupFee" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Currency</label>
+            <div class="select-wrapper">
+              <select class="form-select" id="cliCurrency">
+                <option value="USD">USD</option>
+                <option value="BDT">BDT</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Retainer</label>
+          <input type="number" class="form-input" id="cliRetainer" placeholder="0">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-input" id="cliStartDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Next Payment Due</label>
+            <input type="date" class="form-input" id="cliNextPay">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Name</label>
+          <input type="text" class="form-input" id="cliContactName" placeholder="যেমন: Dr. Smith">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Contact Email</label>
+            <input type="email" class="form-input" id="cliContactEmail" placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp</label>
+            <input type="text" class="form-input" id="cliWhatsapp" placeholder="+880...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="cliNotes" placeholder="অতিরিক্ত নোট..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit"><span class="btn-text">✓ Client যুক্ত করো</span><span class="btn-spinner"><span class="spinner-circle"></span></span></button>
+      </form>
+
+      <!-- PIPELINE (lead) form -->
+      <form id="pipelineAddForm" class="crm-form" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Company Name<span class="required-star">*</span></label>
+          <input type="text" class="form-input" id="plCompany" required placeholder="যেমন: XYZ HVAC Services">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Contact Person</label>
+            <input type="text" class="form-input" id="plContact" placeholder="নাম">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country<span class="required-star">*</span></label>
+            <div class="select-wrapper">
+              <select class="form-select" id="plCountry" required>
+                <option value="Bangladesh">Bangladesh</option>
+                <option value="USA">USA</option>
+                <option value="UK">UK</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="plEmail" placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp/Phone</label>
+            <input type="text" class="form-input" id="plPhone" placeholder="+880...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service Interest<span class="required-star">*</span></label>
+          <div class="select-wrapper">
+            <select class="form-select" id="plService" required>
+              <option value="School Management ERP">BD-1 · School ERP</option>
+              <option value="Clinic & Doctor Automation">BD-2 · Clinic Automation</option>
+              <option value="Local Business WhatsApp Automation">BD-3 · WhatsApp Automation</option>
+              <option value="AI Website + SEO Content System">BD-4 · Website + SEO</option>
+              <option value="Personal Productivity Automation">BD-5 · Productivity Automation</option>
+              <option value="Dental Practice Automation">GL-1 · Dental Automation</option>
+              <option value="Healthcare & Med Spa Automation">GL-2 · Healthcare Automation</option>
+              <option value="Home Service Business Automation">GL-3 · Home Service Automation</option>
+              <option value="AI Voice Agent">GL-4 · AI Voice Agent</option>
+              <option value="Real Estate Lead Automation">GL-5 · Real Estate Automation</option>
+              <option value="E-commerce Automation">GL-6 · E-commerce Automation</option>
+              <option value="Google Review Automation">GL-7 · Review Automation</option>
+              <option value="AI Content Repurposing">GL-8 · Content Repurposing</option>
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Lead Source</label>
+            <div class="select-wrapper">
+              <select class="form-select" id="plSource">
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Cold Email">Cold Email</option>
+                <option value="Referral">Referral</option>
+                <option value="Facebook Group">Facebook Group</option>
+                <option value="Website">Website</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stage<span class="required-star">*</span></label>
+            <div class="select-wrapper">
+              <select class="form-select" id="plStage" required>
+                <option value="New">New</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Demo Sent">Demo Sent</option>
+                <option value="Negotiating">Negotiating</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Estimated Value (USD)</label>
+            <input type="number" class="form-input" id="plValue" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Probability %</label>
+            <input type="number" class="form-input" id="plProb" placeholder="0-100" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">First Contact Date</label>
+            <input type="date" class="form-input" id="plFirstContact">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Next Action Date</label>
+            <input type="date" class="form-input" id="plNextDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Next Action</label>
+          <input type="text" class="form-input" id="plNextAction" placeholder="যেমন: Send case study follow-up">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="plNotes" placeholder="অতিরিক্ত নোট..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit"><span class="btn-text">✓ Lead যুক্ত করো</span><span class="btn-spinner"><span class="spinner-circle"></span></span></button>
+      </form>
+
+      <!-- PROJECT form -->
+      <form id="projectAddForm" class="crm-form" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Project Name<span class="required-star">*</span></label>
+          <input type="text" class="form-input" id="prName" required placeholder="যেমন: Bright Smile — GHL Setup">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link to Client (Optional)</label>
+          <div class="select-wrapper">
+            <select class="form-select" id="prClientId">
+              <option value="">— কোনো client নয় —</option>
+              <!-- populated by JS -->
+            </select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service Type<span class="required-star">*</span></label>
+          <input type="text" class="form-input" id="prService" required placeholder="যেমন: GoHighLevel Setup">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Status<span class="required-star">*</span></label>
+            <div class="select-wrapper">
+              <select class="form-select" id="prStatus" required>
+                <option value="Discovery">Discovery</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Testing">Testing</option>
+                <option value="Live">Live</option>
+                <option value="On Hold">On Hold</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phase</label>
+            <input type="text" class="form-input" id="prPhase" placeholder="যেমন: Build">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-input" id="prStartDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deadline</label>
+            <input type="date" class="form-input" id="prDeadline">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Completion %</label>
+          <input type="number" class="form-input" id="prPct" min="0" max="100" placeholder="0-100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deliverables</label>
+          <textarea class="form-textarea" id="prDeliverables" placeholder="কী delivery করতে হবে..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Blockers</label>
+          <textarea class="form-textarea" id="prBlockers" placeholder="কোনো বাধা থাকলে লিখো..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit"><span class="btn-text">✓ Project যুক্ত করো</span><span class="btn-spinner"><span class="spinner-circle"></span></span></button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT                                                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIGURATION — সবচেয়ে গুরুত্বপূর্ণ লাইন এখানে
+// ════════════════════════════════════════════════════════════
+
+// ⚠️⚠️⚠️ এখানে তোমার Part 1-এর Web App URL বসাও ⚠️⚠️⚠️
+// Apps Script → Deploy → Web app → URL কপি করো
+var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec";
+
+// ════════════════════════════════════════════════════════════
+// STATE — সব app-wide data এখানে রাখা হয়
+// ════════════════════════════════════════════════════════════
+
+var STATE = {
+  currentTab: 'entry',
+  currentCrmTab: 'clients',
+  currentType: null, // খরচ / আয় / সঞ্চয়
+
+  // Category lists — localStorage-এ persist হয়, AppSheet-এর মতো add/remove করা যায়
+  categories: {
+    expense: [
+      "Office Rent", "Team Salary & Payments", "Software & Subscriptions (GoHighLevel/Make.com/Twilio)",
+      "Marketing & Ads", "Domain & Hosting", "Freelancer/Contractor Payment",
+      "Client Acquisition Cost", "Travel & Transport", "Office Supplies",
+      "বিদ্যুৎ ও ইন্টারনেট বিল", "Bank Charges & Fees", "Training & Courses", "অন্যান্য"
+    ],
+    income: [
+      "Setup Fee (Bangladesh Client)", "Setup Fee (Global Client)",
+      "Monthly Retainer (Bangladesh Client)", "Client Retainer (Global — USA/UK)",
+      "Consulting/One-off Project", "Affiliate/Referral Income", "অন্যান্য আয়"
+    ],
+    savings: [
+      "Business Emergency Fund", "Tax Reserve", "Equipment/Tools Upgrade Fund",
+      "Team Expansion Fund", "Personal Savings", "Investment"
+    ]
+  },
+
+  // Cache of CRM data (loaded once, refreshed on demand — keeps mobile usage light)
+  clients: [],
+  pipeline: [],
+  projects: [],
+
+  reportMonthOffset: 0, // 0 = current month, -1 = last month etc.
+  editingCrmType: null, // 'client' | 'pipeline' | 'project' — for FAB context
+  newsLoadedOnce: false  // News tab-এ একবারের বেশি auto-fetch না করার জন্য (Part 3)
+};
+
+var TYPE_CONFIG = {
+  "খরচ":   { key: "expense", icon: "💸", label: "খরচ" },
+  "আয়":    { key: "income",  icon: "💰", label: "আয়" },
+  "সঞ্চয়": { key: "savings", icon: "🏦", label: "সঞ্চয়" }
+};
+
+// ════════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════════
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function formatDateDDMMYYYY(d) {
+  return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear();
+}
+
+function todayInputValue() {
+  var d = new Date();
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+
+function convertInputDateToDisplay(inputDateStr) {
+  if (!inputDateStr) return '';
+  var parts = inputDateStr.split('-');
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+
+function formatCurrency(amount, currency) {
+  var symbol = currency === 'USD' ? '$' : '৳';
+  var n = parseFloat(amount) || 0;
+  return symbol + Math.round(n).toLocaleString('en-US');
+}
+
+function formatBDT(amount) {
+  var n = parseFloat(amount) || 0;
+  return '৳' + Math.round(n).toLocaleString('en-US');
+}
+
+function loadCategoriesFromStorage() {
+  try {
+    var saved = localStorage.getItem('aumatiq_categories');
+    if (saved) STATE.categories = JSON.parse(saved);
+  } catch (e) { console.warn('Category load failed, using defaults', e); }
+}
+
+function saveCategoriesToStorage() {
+  try { localStorage.setItem('aumatiq_categories', JSON.stringify(STATE.categories)); }
+  catch (e) { console.warn('Category save failed', e); }
+}
+
+// ════════════════════════════════════════════════════════════
+// CLOCK
+// ════════════════════════════════════════════════════════════
+
+function updateHeaderClock() {
+  var now = new Date();
+  var dateStr = formatDateDDMMYYYY(now);
+  var hours = now.getHours();
+  var minutes = pad2(now.getMinutes());
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  document.getElementById('headerClock').textContent = dateStr + ' ' + pad2(hours) + ':' + minutes + ampm;
+}
+
+// ════════════════════════════════════════════════════════════
+// TOAST SYSTEM
+// ════════════════════════════════════════════════════════════
+
+function showToast(type, title, msg) {
+  var container = document.getElementById('toastContainer');
+  var icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML =
+    '<span class="toast-icon">' + (icons[type] || 'ℹ️') + '</span>' +
+    '<div class="toast-body"><div class="toast-title">' + title + '</div>' +
+    (msg ? '<div class="toast-msg">' + msg + '</div>' : '') + '</div>';
+  container.appendChild(toast);
+  setTimeout(function () {
+    toast.classList.add('removing');
+    setTimeout(function () { toast.remove(); }, 250);
+  }, 3500);
+}
+
+// ════════════════════════════════════════════════════════════
+// OFFLINE DETECTION
+// ════════════════════════════════════════════════════════════
+
+function updateOfflineBanner() {
+  var banner = document.getElementById('offlineBanner');
+  if (navigator.onLine) banner.classList.remove('show');
+  else banner.classList.add('show');
+}
+window.addEventListener('online', updateOfflineBanner);
+window.addEventListener('offline', updateOfflineBanner);
+
+// ════════════════════════════════════════════════════════════
+// API CALL WRAPPER — সব action (entry/CRM) এই function দিয়ে যায়
+// ════════════════════════════════════════════════════════════
+
+function callBackend(payload, onSuccess, onError) {
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+    showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
+    if (onError) onError();
+    return;
+  }
+
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success) { if (onSuccess) onSuccess(data); }
+      else {
+        showToast('error', 'এন্ট্রি সংরক্ষণ করা যায়নি', data.error || 'অজানা সমস্যা');
+        if (onError) onError(data);
+      }
+    })
+    .catch(function (err) {
+      showToast('error', 'নেটওয়ার্ক সমস্যা', 'ইন্টারনেট চেক করো এবং আবার চেষ্টা করো।');
+      if (onError) onError(err);
+    });
+}
+
+// ════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ════════════════════════════════════════════════════════════
+
+var TAB_SUBTITLES = {
+  entry: 'এন্ট্রি', dashboard: 'Dashboard', crm: 'CRM',
+  reports: 'Reports', news: 'News Briefing'
+};
+
+function switchTab(tabName) {
+  STATE.currentTab = tabName;
+
+  document.querySelectorAll('.tab-page').forEach(function (p) { p.classList.remove('active'); });
+  document.getElementById('page-' + tabName).classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(function (b) {
+    b.classList.toggle('active', b.dataset.tab === tabName);
+  });
+
+  document.getElementById('pageHeaderSubtitle').textContent = TAB_SUBTITLES[tabName] || '';
+
+  document.getElementById('crmFabAdd').style.display = (tabName === 'crm') ? 'flex' : 'none';
+
+  if (tabName === 'dashboard') renderDashboard();
+  if (tabName === 'crm') renderCrmList();
+  if (tabName === 'reports') renderReports();
+  if (tabName === 'news' && !STATE.newsLoadedOnce) { STATE.newsLoadedOnce = true; loadNewsBriefing(); }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.nav-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () { switchTab(btn.dataset.tab); });
+});
+
+// ════════════════════════════════════════════════════════════
+// SERVICE WORKER REGISTRATION
+// ════════════════════════════════════════════════════════════
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (err) {
+      console.warn('Service worker registration failed:', err);
+    });
+  });
+}
+
+
+// ════════════════════════════════════════════════════════════
+// TAB 1 — এন্ট্রি FORM LOGIC
+// ════════════════════════════════════════════════════════════
+
+function selectType(type) {
+  STATE.currentType = type;
+  var cfg = TYPE_CONFIG[type];
+
+  document.querySelectorAll('.type-btn').forEach(function (b) {
+    b.classList.remove('active-expense', 'active-income', 'active-savings');
+  });
+  var btnMap = { "খরচ": "btnTypeExpense", "আয়": "btnTypeIncome", "সঞ্চয়": "btnTypeSavings" };
+  document.getElementById(btnMap[type]).classList.add('active-' + cfg.key);
+
+  var form = document.getElementById('entryForm');
+  form.classList.remove('show-expense', 'show-income', 'show-savings');
+  form.classList.add('show-' + cfg.key);
+
+  populateCategoryDropdown(cfg.key);
+
+  // Currency prefix update হবে currency dropdown change হলে — কিন্তু default রিসেট করি
+  updateCurrencyPrefix();
+}
+
+document.getElementById('btnTypeExpense').addEventListener('click', function () { selectType('খরচ'); });
+document.getElementById('btnTypeIncome').addEventListener('click', function () { selectType('আয়'); });
+document.getElementById('btnTypeSavings').addEventListener('click', function () { selectType('সঞ্চয়'); });
+
+function populateCategoryDropdown(categoryKey) {
+  var select = document.getElementById('entryCategory');
+  select.innerHTML = '';
+  STATE.categories[categoryKey].forEach(function (cat) {
+    var opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    select.appendChild(opt);
+  });
+}
+
+function updateCurrencyPrefix() {
+  var currency = document.getElementById('entryCurrency').value;
+  document.getElementById('currencyPrefix').textContent = currency === 'USD' ? '$' : '৳';
+}
+document.getElementById('entryCurrency').addEventListener('change', updateCurrencyPrefix);
+
+// Populate Client Link dropdown (income only) from cached CLIENTS data
+function populateClientLinkDropdown() {
+  var select = document.getElementById('entryClientLink');
+  select.innerHTML = '<option value="">— নির্বাচন করো (optional) —</option>';
+  STATE.clients.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name;
+    select.appendChild(opt);
+  });
+}
+
+// Set today's date as default on load
+document.getElementById('entryDate').value = todayInputValue();
+
+// ── FORM SUBMIT → opens Review screen (does NOT save yet) ──
+document.getElementById('entryForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  var amount = document.getElementById('entryAmount').value;
+  var category = document.getElementById('entryCategory').value;
+  var currency = document.getElementById('entryCurrency').value;
+  var dateVal = document.getElementById('entryDate').value;
+  var payment = document.getElementById('entryPayment').value;
+  var member = document.getElementById('entryMember').value;
+
+  var hasError = false;
+  document.getElementById('entryAmount').classList.remove('error');
+  document.getElementById('errAmount').classList.remove('show');
+  document.getElementById('entryCategory').classList.remove('error');
+  document.getElementById('errCategory').classList.remove('show');
+
+  if (!STATE.currentType) {
+    showToast('warning', 'ধরন নির্বাচন করো', 'খরচ, আয়, বা সঞ্চয় — একটি বেছে নাও।');
+    return;
+  }
+  if (!amount || parseFloat(amount) <= 0) {
+    document.getElementById('entryAmount').classList.add('error');
+    document.getElementById('errAmount').classList.add('show');
+    hasError = true;
+  }
+  if (!category) {
+    document.getElementById('entryCategory').classList.add('error');
+    document.getElementById('errCategory').classList.add('show');
+    hasError = true;
+  }
+  if (hasError) return;
+
+  openReviewScreen({
+    type: STATE.currentType,
+    amount: amount,
+    currency: currency,
+    category: category,
+    date: dateVal,
+    payment: payment,
+    member: member,
+    clientId: document.getElementById('entryClientLink').value || '',
+    noteExpense: document.getElementById('noteExpenseField').value,
+    noteIncome: document.getElementById('noteIncomeField').value,
+    noteSavings: document.getElementById('noteSavingsField').value
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+// REVIEW SCREEN
+// ════════════════════════════════════════════════════════════
+
+var pendingEntry = null;
+
+function openReviewScreen(entryData) {
+  pendingEntry = entryData;
+  var cfg = TYPE_CONFIG[entryData.type];
+
+  document.getElementById('reviewTypeLabel').textContent = cfg.icon + ' ' + cfg.label;
+  document.getElementById('reviewCurrencySymbol').textContent = entryData.currency === 'USD' ? '$' : '৳';
+  document.getElementById('reviewAmountValue').textContent = Math.round(parseFloat(entryData.amount)).toLocaleString('en-US');
+
+  var itemsHtml = '';
+  itemsHtml += reviewItemRow('ধরন', cfg.label);
+  itemsHtml += reviewItemRow('ক্যাটাগরি', entryData.category);
+  itemsHtml += reviewItemRow('তারিখ', convertInputDateToDisplay(entryData.date));
+  itemsHtml += reviewItemRow('Payment', entryData.payment);
+  itemsHtml += reviewItemRow('Member', entryData.member);
+
+  if (entryData.type === 'খরচ' && entryData.noteExpense) itemsHtml += reviewItemRow('বিবরণ', entryData.noteExpense);
+  if (entryData.type === 'আয়' && entryData.noteIncome) itemsHtml += reviewItemRow('বিস্তারিত', entryData.noteIncome);
+  if (entryData.type === 'সঞ্চয়' && entryData.noteSavings) itemsHtml += reviewItemRow('লক্ষ্য', entryData.noteSavings);
+
+  document.getElementById('reviewItemsList').innerHTML = itemsHtml;
+  document.getElementById('reviewOverlay').classList.add('show');
+}
+
+function reviewItemRow(label, value) {
+  return '<div class="review-item"><span class="review-item-label">' + label + '</span><span class="review-item-value">' + value + '</span></div>';
+}
+
+function closeReviewScreen() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+}
+
+document.getElementById('reviewEditBtn').addEventListener('click', closeReviewScreen);
+
+document.getElementById('reviewConfirmBtn').addEventListener('click', function () {
+  if (!pendingEntry) return;
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = 'সংরক্ষণ হচ্ছে...';
+
+  var payload = {
+    action: 'entry',
+    type: pendingEntry.type,
+    category: pendingEntry.category,
+    amount: parseFloat(pendingEntry.amount),
+    currency: pendingEntry.currency,
+    date: convertInputDateToDisplay(pendingEntry.date),
+    payment: pendingEntry.payment,
+    member: pendingEntry.member,
+    clientId: pendingEntry.clientId,
+    noteExpense: pendingEntry.noteExpense,
+    noteIncome: pendingEntry.noteIncome,
+    noteSavings: pendingEntry.noteSavings
+  };
+
+  callBackend(payload,
+    function (data) {
+      closeReviewScreen();
+      showToast('success', 'এন্ট্রি সফল!', data.message || 'সংরক্ষিত হয়েছে।');
+      resetEntryForm();
+      btn.disabled = false;
+      btn.textContent = '✓ নিশ্চিত করুন';
+    },
+    function () {
+      btn.disabled = false;
+      btn.textContent = '✓ নিশ্চিত করুন';
+    }
+  );
+});
+
+function resetEntryForm() {
+  document.getElementById('entryForm').reset();
+  document.getElementById('entryDate').value = todayInputValue();
+  if (STATE.currentType) selectType(STATE.currentType); // field visibility ঠিক রাখার জন্য reset পরে আবার call করা আবশ্যক
+}
+
+// ════════════════════════════════════════════════════════════
+// CATEGORY MANAGER MODAL
+// ════════════════════════════════════════════════════════════
+
+function openCategoryModal() {
+  if (!STATE.currentType) {
+    showToast('warning', 'প্রথমে ধরন বেছে নাও', 'খরচ/আয়/সঞ্চয় — একটি select করো।');
+    return;
+  }
+  var cfg = TYPE_CONFIG[STATE.currentType];
+  document.getElementById('categoryModalTitle').textContent = cfg.label + 'এর ক্যাটাগরি';
+  renderCategoryListModal(cfg.key);
+  document.getElementById('categoryModal').classList.add('show');
+}
+
+function renderCategoryListModal(categoryKey) {
+  var container = document.getElementById('categoryListModal');
+  container.innerHTML = '';
+  STATE.categories[categoryKey].forEach(function (cat, idx) {
+    var item = document.createElement('div');
+    item.className = 'category-item-modal';
+    item.innerHTML = '<span>' + cat + '</span><button class="cat-delete-btn" data-idx="' + idx + '">🗑️</button>';
+    container.appendChild(item);
+  });
+
+  container.querySelectorAll('.cat-delete-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var idx = parseInt(btn.dataset.idx, 10);
+      STATE.categories[categoryKey].splice(idx, 1);
+      saveCategoriesToStorage();
+      renderCategoryListModal(categoryKey);
+      populateCategoryDropdown(categoryKey);
+    });
+  });
+}
+
+document.getElementById('manageCategoryLink').addEventListener('click', openCategoryModal);
+document.getElementById('categoryModalClose').addEventListener('click', function () {
+  document.getElementById('categoryModal').classList.remove('show');
+});
+
+document.getElementById('addCategoryBtn').addEventListener('click', function () {
+  var input = document.getElementById('newCategoryInput');
+  var val = input.value.trim();
+  if (!val) return;
+  var cfg = TYPE_CONFIG[STATE.currentType];
+  if (STATE.categories[cfg.key].indexOf(val) !== -1) {
+    showToast('warning', 'ইতিমধ্যে আছে', 'এই ক্যাটাগরি আগেই যুক্ত করা আছে।');
+    return;
+  }
+  STATE.categories[cfg.key].push(val);
+  saveCategoriesToStorage();
+  renderCategoryListModal(cfg.key);
+  populateCategoryDropdown(cfg.key);
+  input.value = '';
+});
+
+// ════════════════════════════════════════════════════════════
+// TAB 2 — DASHBOARD RENDERING
+// ════════════════════════════════════════════════════════════
+//
+// নোট: Part 1-এর Code.gs ইতিমধ্যে Dashboard tab-এ পুরো summary লিখে রাখে
+// (refreshDashboard ফাংশন)। এই PWA-তে আমরা সরাসরি Sheets API দিয়ে Dashboard
+// tab পড়তে পারি না (Apps Script Web App শুধু doPost/doGet handle করে),
+// তাই Dashboard ভিউ এখানে client-side cached entry/CRM data থেকে নিজে
+// calculate করে দেখানো হয় — Google Sheet-এর Dashboard tab-ও সমান্তরালে
+// একই হিসাব রাখে (backend থেকে), দুটো জায়গায় same numbers থাকবে।
+//
+// বাস্তব ব্যবহারে: তুমি যখনই entry/CRM data সংরক্ষণ করবে, doPost() নিজে
+// refreshDashboard() trigger করে — তাই Google Sheet-এর Dashboard tab সবসময়
+// up-to-date থাকে, এই PWA view টা সেই হিসাবের mobile-friendly প্রতিচ্ছবি মাত্র।
+
+var monthLabelsBn = ["", "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
+  "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+
+function getMonthKeyWithOffset(offset) {
+  var d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return { year: d.getFullYear(), month: d.getMonth() + 1, key: d.getFullYear() + '-' + pad2(d.getMonth() + 1) };
+}
+
+function renderDashboard() {
+  var mk = getMonthKeyWithOffset(0);
+  document.getElementById('dashboardMonthLabel').textContent = monthLabelsBn[mk.month] + ' ' + mk.year;
+
+  // Demo/placeholder note: প্রকৃত entry data Part 1 backend-এ Google Sheets-এ আছে।
+  // এই PWA নিজে cached client-side summary দেখায় যদি কোনো entry এই session-এ করা হয়।
+  // প্রথমবার app খুললে সব শূন্য দেখাবে যতক্ষণ না entry দেওয়া হয় — এটাই প্রত্যাশিত।
+
+  showToast('info', 'Dashboard', 'লাইভ ডেটার জন্য Google Sheet-এর "Dashboard" ট্যাব দেখো — সেখানে backend থেকে স্বয়ংক্রিয়ভাবে আপডেট হয়।');
+}
+
+document.getElementById('refreshDashboardBtn').addEventListener('click', function () {
+  showToast('info', 'রিফ্রেশ হচ্ছে', 'Google Sheet-এর Dashboard ট্যাব প্রতিটি নতুন এন্ট্রির পর নিজেই আপডেট হয়।');
+  renderDashboard();
+});
+
+// ════════════════════════════════════════════════════════════
+// TAB 3 — CRM RENDERING (Clients / Pipeline / Projects)
+// ════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.crm-subtab-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    STATE.currentCrmTab = btn.dataset.crmtab;
+    document.querySelectorAll('.crm-subtab-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.crm-subpage').forEach(function (p) { p.style.display = 'none'; });
+    document.getElementById('crm-' + STATE.currentCrmTab).style.display = 'block';
+  });
+});
+
+function renderCrmList() {
+  renderClientsList();
+  renderPipelineList();
+  renderProjectsList();
+}
+
+function renderClientsList() {
+  var container = document.getElementById('clientsList');
+  if (STATE.clients.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">এখনো কোনো client যুক্ত হয়নি।<br>নিচের + বাটনে ট্যাপ করে প্রথম client যুক্ত করো।</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.clients.forEach(function (c) {
+    var statusClass = c.status === 'Active' ? 'active' : (c.status === 'Paused' ? 'paused' : 'churned');
+    html += '<div class="crm-item-card">' +
+      '<div class="crm-item-top"><div><div class="crm-item-name">' + c.name + '</div>' +
+      '<div class="crm-item-sub">' + c.service + ' · ' + c.country + '</div></div>' +
+      '<span class="status-pill ' + statusClass + '">' + c.status + '</span></div>' +
+      '<div class="crm-item-meta"><span class="crm-item-sub">' + (c.contactName || '—') + '</span>' +
+      '<span class="crm-item-value">' + formatCurrency(c.retainer, c.currency) + '/mo</span></div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function renderPipelineList() {
+  var container = document.getElementById('pipelineList');
+  if (STATE.pipeline.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><div class="empty-state-text">এখনো কোনো lead যুক্ত হয়নি।<br>নিচের + বাটনে ট্যাপ করে প্রথম lead যুক্ত করো।</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.pipeline.forEach(function (p) {
+    var stageClass = p.stage.toLowerCase().replace(/\s+/g, '');
+    html += '<div class="crm-item-card">' +
+      '<div class="crm-item-top"><div><div class="crm-item-name">' + p.company + '</div>' +
+      '<div class="crm-item-sub">' + p.serviceInterest + ' · ' + p.country + '</div></div>' +
+      '<span class="stage-pill ' + stageClass + '">' + p.stage + '</span></div>' +
+      '<div class="crm-item-meta"><span class="crm-item-sub">' + (p.contactPerson || '—') + ' · ' + (p.probability || 0) + '%</span>' +
+      '<span class="crm-item-value">$' + Math.round(p.estimatedValue || 0).toLocaleString('en-US') + '</span></div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function renderProjectsList() {
+  var container = document.getElementById('projectsList');
+  if (STATE.projects.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">এখনো কোনো project যুক্ত হয়নি।<br>একটি client active হওয়ার পর project যুক্ত করো।</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.projects.forEach(function (pr) {
+    html += '<div class="crm-item-card">' +
+      '<div class="crm-item-top"><div><div class="crm-item-name">' + pr.name + '</div>' +
+      '<div class="crm-item-sub">' + pr.serviceType + ' · ' + pr.phase + '</div></div>' +
+      '<span class="status-pill active">' + pr.status + '</span></div>' +
+      '<div class="progress-track"><div class="progress-fill indigo" style="width:' + (pr.completionPct || 0) + '%"></div></div>' +
+      '<div class="crm-item-meta"><span class="crm-item-sub">Deadline: ' + (pr.deadline || '—') + '</span>' +
+      '<span class="crm-item-sub">' + (pr.completionPct || 0) + '%</span></div></div>';
+  });
+  container.innerHTML = html;
+}
+
+// ── FAB → opens correct add-modal based on active CRM sub-tab ──
+document.getElementById('crmFabAdd').addEventListener('click', function () {
+  var modal = document.getElementById('crmAddModal');
+  document.querySelectorAll('.crm-form').forEach(function (f) { f.style.display = 'none'; });
+
+  if (STATE.currentCrmTab === 'clients') {
+    document.getElementById('crmModalTitle').textContent = 'নতুন Client যুক্ত করো';
+    document.getElementById('clientAddForm').style.display = 'block';
+  } else if (STATE.currentCrmTab === 'pipeline') {
+    document.getElementById('crmModalTitle').textContent = 'নতুন Lead যুক্ত করো';
+    document.getElementById('pipelineAddForm').style.display = 'block';
+  } else {
+    document.getElementById('crmModalTitle').textContent = 'নতুন Project যুক্ত করো';
+    populateProjectClientDropdown();
+    document.getElementById('projectAddForm').style.display = 'block';
+  }
+  modal.classList.add('show');
+});
+
+document.getElementById('crmModalClose').addEventListener('click', function () {
+  document.getElementById('crmAddModal').classList.remove('show');
+});
+
+function populateProjectClientDropdown() {
+  var select = document.getElementById('prClientId');
+  select.innerHTML = '<option value="">— কোনো client নয় —</option>';
+  STATE.clients.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name;
+    select.appendChild(opt);
+  });
+}
+
+// ── CLIENT ADD SUBMIT ──
+document.getElementById('clientAddForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var payload = {
+    action: 'client_add',
+    clientName: document.getElementById('cliName').value,
+    businessType: document.getElementById('cliType').value,
+    country: document.getElementById('cliCountry').value,
+    service: document.getElementById('cliService').value,
+    status: document.getElementById('cliStatus').value,
+    setupFee: parseFloat(document.getElementById('cliSetupFee').value) || 0,
+    currency: document.getElementById('cliCurrency').value,
+    retainer: parseFloat(document.getElementById('cliRetainer').value) || 0,
+    startDate: convertInputDateToDisplay(document.getElementById('cliStartDate').value),
+    nextPaymentDue: convertInputDateToDisplay(document.getElementById('cliNextPay').value),
+    contactName: document.getElementById('cliContactName').value,
+    contactEmail: document.getElementById('cliContactEmail').value,
+    whatsapp: document.getElementById('cliWhatsapp').value,
+    notes: document.getElementById('cliNotes').value,
+    healthScore: '🟢 Healthy'
+  };
+
+  callBackend(payload, function (data) {
+    STATE.clients.push({
+      id: data.clientId, name: payload.clientName, service: payload.service,
+      country: payload.country, status: payload.status, contactName: payload.contactName,
+      retainer: payload.retainer, currency: payload.currency
+    });
+    document.getElementById('crmAddModal').classList.remove('show');
+    document.getElementById('clientAddForm').reset();
+    showToast('success', 'Client যুক্ত হয়েছে!', payload.clientName);
+    renderClientsList();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+// ── PIPELINE ADD SUBMIT ──
+document.getElementById('pipelineAddForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var payload = {
+    action: 'pipeline_add',
+    companyName: document.getElementById('plCompany').value,
+    contactPerson: document.getElementById('plContact').value,
+    email: document.getElementById('plEmail').value,
+    phone: document.getElementById('plPhone').value,
+    country: document.getElementById('plCountry').value,
+    serviceInterest: document.getElementById('plService').value,
+    leadSource: document.getElementById('plSource').value,
+    stage: document.getElementById('plStage').value,
+    estimatedValue: parseFloat(document.getElementById('plValue').value) || 0,
+    firstContactDate: convertInputDateToDisplay(document.getElementById('plFirstContact').value),
+    nextAction: document.getElementById('plNextAction').value,
+    nextActionDate: convertInputDateToDisplay(document.getElementById('plNextDate').value),
+    probability: parseFloat(document.getElementById('plProb').value) || 0,
+    notes: document.getElementById('plNotes').value
+  };
+
+  callBackend(payload, function (data) {
+    STATE.pipeline.push({
+      id: data.leadId, company: payload.companyName, serviceInterest: payload.serviceInterest,
+      country: payload.country, stage: payload.stage, contactPerson: payload.contactPerson,
+      estimatedValue: payload.estimatedValue, probability: payload.probability
+    });
+    document.getElementById('crmAddModal').classList.remove('show');
+    document.getElementById('pipelineAddForm').reset();
+    showToast('success', 'Lead যুক্ত হয়েছে!', payload.companyName);
+    renderPipelineList();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+// ── PROJECT ADD SUBMIT ──
+document.getElementById('projectAddForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var payload = {
+    action: 'project_add',
+    clientId: document.getElementById('prClientId').value,
+    projectName: document.getElementById('prName').value,
+    serviceType: document.getElementById('prService').value,
+    status: document.getElementById('prStatus').value,
+    startDate: convertInputDateToDisplay(document.getElementById('prStartDate').value),
+    deadline: convertInputDateToDisplay(document.getElementById('prDeadline').value),
+    completionPct: parseFloat(document.getElementById('prPct').value) || 0,
+    phase: document.getElementById('prPhase').value || 'Discovery',
+    deliverables: document.getElementById('prDeliverables').value,
+    blockers: document.getElementById('prBlockers').value
+  };
+
+  callBackend(payload, function (data) {
+    STATE.projects.push({
+      id: data.projectId, name: payload.projectName, serviceType: payload.serviceType,
+      status: payload.status, phase: payload.phase, completionPct: payload.completionPct,
+      deadline: payload.deadline
+    });
+    document.getElementById('crmAddModal').classList.remove('show');
+    document.getElementById('projectAddForm').reset();
+    showToast('success', 'Project যুক্ত হয়েছে!', payload.projectName);
+    renderProjectsList();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+// ════════════════════════════════════════════════════════════
+// TAB 4 — REPORTS RENDERING
+// ════════════════════════════════════════════════════════════
+
+document.getElementById('reportPrevMonth').addEventListener('click', function () {
+  STATE.reportMonthOffset -= 1;
+  renderReports();
+});
+document.getElementById('reportNextMonth').addEventListener('click', function () {
+  if (STATE.reportMonthOffset < 0) {
+    STATE.reportMonthOffset += 1;
+    renderReports();
+  }
+});
+
+function renderReports() {
+  var mk = getMonthKeyWithOffset(STATE.reportMonthOffset);
+  document.getElementById('reportMonthLabel').textContent = monthLabelsBn[mk.month] + ' ' + mk.year;
+
+  // এই session-এ যা entry হয়েছে তা থেকে bar chart আনুমানিক দেখানো হয়।
+  // পূর্ণ historical ডেটার জন্য Google Sheet-এর "এন্ট্রি" ট্যাব দেখো (filter দিয়ে মাস বেছে নিতে পারো)।
+  document.getElementById('reportActiveProjects').textContent = STATE.projects.filter(function (p) {
+    return p.status !== 'On Hold';
+  }).length;
+  document.getElementById('reportWonDeals').textContent = STATE.pipeline.filter(function (p) {
+    return p.stage === 'Won';
+  }).length;
+  document.getElementById('reportNewClients').textContent = STATE.clients.length;
+  document.getElementById('reportAvgHealth').textContent = STATE.clients.length > 0 ? '🟢 Healthy' : '—';
+}
+
+// ════════════════════════════════════════════════════════════
+// APP INIT — সব data load করে App চালু করে
+// ════════════════════════════════════════════════════════════
+
+function initApp() {
+  loadCategoriesFromStorage();
+  updateHeaderClock();
+  setInterval(updateHeaderClock, 30000);
+  updateOfflineBanner();
+
+  // Default type select করে দাও যাতে ফাঁকা state না থাকে
+  selectType('খরচ');
+  populateClientLinkDropdown();
+
+  switchTab('entry');
+}
+
+// ════════════════════════════════════════════════════════════
+// TAB 5 — NEWS BRIEFING (Part 3)
+// ════════════════════════════════════════════════════════════
+
+function loadNewsBriefing() {
+  document.getElementById('newsLoadingState').style.display = 'block';
+  document.getElementById('newsContentState').style.display = 'none';
+  document.getElementById('newsErrorState').style.display = 'none';
+
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+    showNewsError('WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
+    return;
+  }
+
+  var url = WEB_APP_URL + '?action=get_news';
+
+  fetch(url)
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success && data.data) {
+        renderNewsBriefing(data.data);
+      } else {
+        showNewsError(data.error || 'News data পাওয়া যায়নি।');
+      }
+    })
+    .catch(function () {
+      showNewsError('নেটওয়ার্ক সমস্যা — ইন্টারনেট চেক করো এবং আবার চেষ্টা করো।');
+    });
+}
+
+function showNewsError(message) {
+  document.getElementById('newsLoadingState').style.display = 'none';
+  document.getElementById('newsContentState').style.display = 'none';
+  document.getElementById('newsErrorState').style.display = 'block';
+  document.getElementById('newsErrorText').textContent = message;
+}
+
+function renderNewsBriefing(newsData) {
+  document.getElementById('newsLoadingState').style.display = 'none';
+  document.getElementById('newsErrorState').style.display = 'none';
+  document.getElementById('newsContentState').style.display = 'block';
+
+  document.getElementById('newsInternational').innerHTML = buildNewsCardsHtml(newsData.international, null);
+  document.getElementById('newsBangladesh').innerHTML = buildNewsCardsHtml(newsData.bangladesh, null);
+  document.getElementById('newsInterest').innerHTML = buildNewsCardsHtml(newsData.interests, 'category');
+
+  if (newsData.interestLabels && newsData.interestLabels.length > 0) {
+    var labels = newsData.interestLabels.map(function (l) {
+      return l.charAt(0).toUpperCase() + l.slice(1);
+    }).join(', ');
+    document.getElementById('newsInterestTitle').textContent = 'তোমার ইন্টারেস্ট (' + labels + ')';
+  }
+
+  document.getElementById('newsUpdatedNote').textContent = 'সর্বশেষ আপডেট: ' + (newsData.generatedAt || '—');
+}
+
+function buildNewsCardsHtml(items, tagField) {
+  if (!items || items.length === 0) {
+    return '<div class="empty-state" style="padding:24px;"><div class="empty-state-text">এই সেকশনে কোনো news পাওয়া যায়নি।</div></div>';
+  }
+  var html = '';
+  items.forEach(function (item) {
+    var tag = tagField && item[tagField] ? '<span class="news-card-tag">' + item[tagField] + '</span>' : '<span></span>';
+    html += '<div class="news-card">' +
+      '<div class="news-card-title">' + item.title + '</div>' +
+      '<div class="news-card-footer">' + tag +
+      '<a href="' + item.link + '" target="_blank" rel="noopener" class="news-card-link">পড়ুন →</a></div></div>';
+  });
+  return html;
+}
+
+document.getElementById('refreshNewsBtn').addEventListener('click', loadNewsBriefing);
+
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
