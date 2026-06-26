@@ -609,6 +609,56 @@ body {
 .add-category-btn:hover { background: var(--indigo-light); }
 
 /* ============================================================
+   CUSTOM CONFIRMATION MODAL (Part 4) — Delete actions
+   ============================================================ */
+
+.confirm-modal-box {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl);
+  padding: 28px 22px; width: 100%; max-width: 360px; text-align: center;
+  box-shadow: var(--shadow-card); transform: scale(0.95);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.show .confirm-modal-box { transform: scale(1); }
+
+.confirm-icon {
+  width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%;
+  background: rgba(255,107,107,0.12); border: 1px solid rgba(255,107,107,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+}
+.confirm-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
+.confirm-message { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 22px; }
+.confirm-message strong { color: var(--text-primary); }
+
+.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-confirm-cancel {
+  padding: 13px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  color: var(--text-primary); font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); -webkit-appearance: none;
+}
+.btn-confirm-cancel:hover { background: var(--indigo-dim); border-color: var(--indigo-border); }
+.btn-confirm-delete {
+  padding: 13px; background: linear-gradient(135deg, #FF6B6B, #FF8A8A); border: none;
+  border-radius: var(--radius-md); color: #fff; font-family: var(--font-body); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: var(--transition); -webkit-appearance: none;
+}
+.btn-confirm-delete:hover { box-shadow: 0 8px 24px rgba(255,107,107,0.35); transform: translateY(-1px); }
+.btn-confirm-delete:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── CRM card action row (Edit/Delete buttons) — Part 4 ── */
+.crm-item-actions {
+  display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+}
+.crm-action-btn {
+  flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-input);
+  color: var(--text-secondary); font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 5px;
+  -webkit-appearance: none;
+}
+.crm-action-btn:hover { background: var(--indigo-dim); color: var(--text-primary); border-color: var(--indigo-border); }
+.crm-action-btn.danger:hover { background: rgba(255,107,107,0.1); color: var(--color-expense); border-color: rgba(255,107,107,0.4); }
+
+
+/* ============================================================
    DASHBOARD TAB
    ============================================================ */
 
@@ -1234,6 +1284,7 @@ body {
 
       <!-- CLIENT form -->
       <form id="clientAddForm" class="crm-form" style="display:none;">
+        <input type="hidden" id="cliEditingId" value="">
         <div class="form-group">
           <label class="form-label">Client Name<span class="required-star">*</span></label>
           <input type="text" class="form-input" id="cliName" required placeholder="যেমন: Bright Smile Dental">
@@ -1341,6 +1392,7 @@ body {
 
       <!-- PIPELINE (lead) form -->
       <form id="pipelineAddForm" class="crm-form" style="display:none;">
+        <input type="hidden" id="plEditingId" value="">
         <div class="form-group">
           <label class="form-label">Company Name<span class="required-star">*</span></label>
           <input type="text" class="form-input" id="plCompany" required placeholder="যেমন: XYZ HVAC Services">
@@ -1457,6 +1509,7 @@ body {
 
       <!-- PROJECT form -->
       <form id="projectAddForm" class="crm-form" style="display:none;">
+        <input type="hidden" id="prEditingId" value="">
         <div class="form-group">
           <label class="form-label">Project Name<span class="required-star">*</span></label>
           <input type="text" class="form-input" id="prName" required placeholder="যেমন: Bright Smile — GHL Setup">
@@ -1524,437 +1577,1173 @@ body {
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
+<!-- DELETE CONFIRMATION MODAL (Part 4) — custom, app-themed     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="modal-overlay" id="confirmDeleteModal">
+  <div class="confirm-modal-box">
+    <div class="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirmDeleteTitle">নিশ্চিত মুছে ফেলবে?</div>
+    <div class="confirm-message" id="confirmDeleteMessage">এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।</div>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" id="confirmDeleteCancelBtn">বাতিল করো</button>
+      <button class="btn-confirm-delete" id="confirmDeleteConfirmBtn">🗑️ মুছে ফেলো</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
 <!-- JAVASCRIPT                                                   -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 
 <script>
-var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec";
+// ════════════════════════════════════════════════════════════
+// CONFIGURATION — সবচেয়ে গুরুত্বপূর্ণ লাইন এখানে
+// ════════════════════════════════════════════════════════════
+
+// ⚠️⚠️⚠️ এখানে তোমার Part 1-এর Web App URL বসাও ⚠️⚠️⚠️
+// Apps Script → Deploy → Web app → URL কপি করো
+var WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
+
+// ════════════════════════════════════════════════════════════
+// STATE — সব app-wide data এখানে রাখা হয়
+// ════════════════════════════════════════════════════════════
 
 var STATE = {
-  currentTab: 'entry', currentCrmTab: 'clients', currentType: null,
+  currentTab: 'entry',
+  currentCrmTab: 'clients',
+  currentType: null, // খরচ / আয় / সঞ্চয়
+
+  // Category lists — localStorage-এ persist হয়, AppSheet-এর মতো add/remove করা যায়
   categories: {
-    expense: ["Office Rent","Team Salary & Payments","Software & Subscriptions (GoHighLevel/Make.com/Twilio)","Marketing & Ads","Domain & Hosting","Freelancer/Contractor Payment","Client Acquisition Cost","Travel & Transport","Office Supplies","বিদ্যুৎ ও ইন্টারনেট বিল","Bank Charges & Fees","Training & Courses","অন্যান্য"],
-    income:  ["Setup Fee (Bangladesh Client)","Setup Fee (Global Client)","Monthly Retainer (Bangladesh Client)","Client Retainer (Global — USA/UK)","Consulting/One-off Project","Affiliate/Referral Income","অন্যান্য আয়"],
-    savings: ["Business Emergency Fund","Tax Reserve","Equipment/Tools Upgrade Fund","Team Expansion Fund","Personal Savings","Investment"]
+    expense: [
+      "Office Rent", "Team Salary & Payments", "Software & Subscriptions (GoHighLevel/Make.com/Twilio)",
+      "Marketing & Ads", "Domain & Hosting", "Freelancer/Contractor Payment",
+      "Client Acquisition Cost", "Travel & Transport", "Office Supplies",
+      "বিদ্যুৎ ও ইন্টারনেট বিল", "Bank Charges & Fees", "Training & Courses", "অন্যান্য"
+    ],
+    income: [
+      "Setup Fee (Bangladesh Client)", "Setup Fee (Global Client)",
+      "Monthly Retainer (Bangladesh Client)", "Client Retainer (Global — USA/UK)",
+      "Consulting/One-off Project", "Affiliate/Referral Income", "অন্যান্য আয়"
+    ],
+    savings: [
+      "Business Emergency Fund", "Tax Reserve", "Equipment/Tools Upgrade Fund",
+      "Team Expansion Fund", "Personal Savings", "Investment"
+    ]
   },
-  clients: [], pipeline: [], projects: [],
-  entrySummary: { income: 0, expense: 0, savings: 0, byCategory: {} },
-  settings: { incomeGoal: 150000, expenseBudget: 60000, savingsGoalPct: 30, usdRate: 110 },
-  reportMonthOffset: 0, editingCrmType: null, newsLoadedOnce: false, dataLoaded: false
+
+  // Cache of CRM data (loaded once, refreshed on demand — keeps mobile usage light)
+  clients: [],
+  pipeline: [],
+  projects: [],
+
+  reportMonthOffset: 0, // 0 = current month, -1 = last month etc.
+  monthlyReportHistory: [], // Part 4 — get_monthly_report থেকে cached, পুরনো → নতুন ক্রমে
+  editingCrmType: null, // 'client' | 'pipeline' | 'project' — for FAB context
+  newsLoadedOnce: false  // News tab-এ একবারের বেশি auto-fetch না করার জন্য (Part 3)
 };
 
 var TYPE_CONFIG = {
-  "খরচ":  { key: "expense", icon: "💸", label: "খরচ" },
-  "আয়":   { key: "income",  icon: "💰", label: "আয়" },
-  "সঞ্চয়":{ key: "savings", icon: "🏦", label: "সঞ্চয়" }
+  "খরচ":   { key: "expense", icon: "💸", label: "খরচ" },
+  "আয়":    { key: "income",  icon: "💰", label: "আয়" },
+  "সঞ্চয়": { key: "savings", icon: "🏦", label: "সঞ্চয়" }
 };
 
-// ── UTILITIES ──
+// ════════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════════
+
 function pad2(n) { return String(n).padStart(2, '0'); }
-function formatDateDDMMYYYY(d) { return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear(); }
-function todayInputValue() { var d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
-function convertInputDateToDisplay(s) { if(!s) return ''; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
-function formatCurrency(a,c) { return (c==='USD'?'$':'৳')+Math.round(parseFloat(a)||0).toLocaleString('en-US'); }
-function formatBDT(a) { return '৳'+Math.round(parseFloat(a)||0).toLocaleString('en-US'); }
-function getCurrentMonthKey() { var d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1); }
 
-// ── STORAGE ──
-var SK = { CL:'aumatiq_clients', PL:'aumatiq_pipeline', PR:'aumatiq_projects', ES:'aumatiq_entry_summary', ST:'aumatiq_settings', CAT:'aumatiq_categories' };
-function saveCRMToStorage() { try { localStorage.setItem(SK.CL,JSON.stringify(STATE.clients)); localStorage.setItem(SK.PL,JSON.stringify(STATE.pipeline)); localStorage.setItem(SK.PR,JSON.stringify(STATE.projects)); } catch(e){} }
-function saveEntriesToStorage() { try { localStorage.setItem(SK.ES,JSON.stringify(STATE.entrySummary)); } catch(e){} }
-function loadFromStorage() {
+function formatDateDDMMYYYY(d) {
+  return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear();
+}
+
+function todayInputValue() {
+  var d = new Date();
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+
+function convertInputDateToDisplay(inputDateStr) {
+  if (!inputDateStr) return '';
+  var parts = inputDateStr.split('-');
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+
+/**
+ * "24/06/2026" → "2026-06-24" (input[type=date]-এর জন্য)
+ * Part 4 — Edit ফর্ম খোলার সময় Sheet-এর DD/MM/YYYY ডেটা date picker-এ বসাতে।
+ * convertInputDateToDisplay()-এর ঠিক বিপরীত — একসাথে রাখা হলো যাতে দুটো
+ * ফাংশন আলাদা জায়গায় ছড়িয়ে কনফিউশন না হয়।
+ */
+function convertDisplayDateToInput(displayDateStr) {
+  if (!displayDateStr) return '';
+  var parts = String(displayDateStr).trim().split('/');
+  if (parts.length !== 3) return '';
+  return parts[2] + '-' + parts[1] + '-' + parts[0];
+}
+
+function formatCurrency(amount, currency) {
+  var symbol = currency === 'USD' ? '$' : '৳';
+  var n = parseFloat(amount) || 0;
+  return symbol + Math.round(n).toLocaleString('en-US');
+}
+
+function formatBDT(amount) {
+  var n = parseFloat(amount) || 0;
+  return '৳' + Math.round(n).toLocaleString('en-US');
+}
+
+function loadCategoriesFromStorage() {
   try {
-    var c=localStorage.getItem(SK.CL);  if(c) STATE.clients=JSON.parse(c);
-    var p=localStorage.getItem(SK.PL);  if(p) STATE.pipeline=JSON.parse(p);
-    var r=localStorage.getItem(SK.PR);  if(r) STATE.projects=JSON.parse(r);
-    var e=localStorage.getItem(SK.ES);  if(e) STATE.entrySummary=JSON.parse(e);
-    var s=localStorage.getItem(SK.ST);  if(s) STATE.settings=JSON.parse(s);
-    var cat=localStorage.getItem(SK.CAT); if(cat) STATE.categories=JSON.parse(cat);
-  } catch(e){}
+    var saved = localStorage.getItem('aumatiq_categories');
+    if (saved) STATE.categories = JSON.parse(saved);
+  } catch (e) { console.warn('Category load failed, using defaults', e); }
 }
-function saveCategoriesToStorage() { try { localStorage.setItem(SK.CAT,JSON.stringify(STATE.categories)); } catch(e){} }
 
-// ── CLOCK ──
+function saveCategoriesToStorage() {
+  try { localStorage.setItem('aumatiq_categories', JSON.stringify(STATE.categories)); }
+  catch (e) { console.warn('Category save failed', e); }
+}
+
+// ════════════════════════════════════════════════════════════
+// CLOCK
+// ════════════════════════════════════════════════════════════
+
 function updateHeaderClock() {
-  var now=new Date(); var h=now.getHours(); var m=pad2(now.getMinutes());
-  var ap=h>=12?'PM':'AM'; h=h%12||12;
-  document.getElementById('headerClock').textContent=formatDateDDMMYYYY(now)+' '+pad2(h)+':'+m+ap;
+  var now = new Date();
+  var dateStr = formatDateDDMMYYYY(now);
+  var hours = now.getHours();
+  var minutes = pad2(now.getMinutes());
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  document.getElementById('headerClock').textContent = dateStr + ' ' + pad2(hours) + ':' + minutes + ampm;
 }
 
-// ── TOAST ──
-function showToast(type,title,msg) {
-  var c=document.getElementById('toastContainer');
-  var icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
-  var t=document.createElement('div'); t.className='toast '+type;
-  t.innerHTML='<span class="toast-icon">'+(icons[type]||'ℹ️')+'</span><div class="toast-body"><div class="toast-title">'+title+'</div>'+(msg?'<div class="toast-msg">'+msg+'</div>':'')+'</div>';
-  c.appendChild(t);
-  setTimeout(function(){ t.classList.add('removing'); setTimeout(function(){ t.remove(); },250); },3500);
+// ════════════════════════════════════════════════════════════
+// TOAST SYSTEM
+// ════════════════════════════════════════════════════════════
+
+function showToast(type, title, msg) {
+  var container = document.getElementById('toastContainer');
+  var icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML =
+    '<span class="toast-icon">' + (icons[type] || 'ℹ️') + '</span>' +
+    '<div class="toast-body"><div class="toast-title">' + title + '</div>' +
+    (msg ? '<div class="toast-msg">' + msg + '</div>' : '') + '</div>';
+  container.appendChild(toast);
+  setTimeout(function () {
+    toast.classList.add('removing');
+    setTimeout(function () { toast.remove(); }, 250);
+  }, 3500);
 }
 
-// ── OFFLINE ──
-function updateOfflineBanner() { var b=document.getElementById('offlineBanner'); if(navigator.onLine) b.classList.remove('show'); else b.classList.add('show'); }
+// ════════════════════════════════════════════════════════════
+// OFFLINE DETECTION
+// ════════════════════════════════════════════════════════════
+
+function updateOfflineBanner() {
+  var banner = document.getElementById('offlineBanner');
+  if (navigator.onLine) banner.classList.remove('show');
+  else banner.classList.add('show');
+}
 window.addEventListener('online', updateOfflineBanner);
 window.addEventListener('offline', updateOfflineBanner);
 
-// ── API CALL ──
+// ════════════════════════════════════════════════════════════
+// API CALL WRAPPER — সব action (entry/CRM) এই function দিয়ে যায়
+// ════════════════════════════════════════════════════════════
+
 function callBackend(payload, onSuccess, onError) {
-  if(WEB_APP_URL==="YOUR_WEB_APP_URL_HERE"){ showToast('error','Setup অসম্পূর্ণ','WEB_APP_URL বসানো হয়নি।'); if(onError) onError(); return; }
-  fetch(WEB_APP_URL,{ method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload), redirect:'follow' })
-    .then(function(r){ return r.json(); })
-    .then(function(d){ if(d.success){ if(onSuccess) onSuccess(d); } else { showToast('error','সংরক্ষণ ব্যর্থ',d.error||'অজানা সমস্যা'); if(onError) onError(d); } })
-    .catch(function(e){ showToast('error','নেটওয়ার্ক সমস্যা','ইন্টারনেট চেক করো।'); if(onError) onError(e); });
-}
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+    showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
+    if (onError) onError();
+    return;
+  }
 
-// ── SHEET DATA FETCH (নতুন) ──
-function fetchDataFromSheet(monthKey, onComplete) {
-  if(WEB_APP_URL==="YOUR_WEB_APP_URL_HERE") return;
-  var url=WEB_APP_URL+'?action=get_data&month='+encodeURIComponent(monthKey||getCurrentMonthKey());
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(resp){
-      if(resp.success && resp.data){
-        var d=resp.data;
-        STATE.clients=d.clients||[]; STATE.pipeline=d.pipeline||[]; STATE.projects=d.projects||[];
-        STATE.entrySummary=d.entries||{income:0,expense:0,savings:0,byCategory:{}};
-        if(d.settings){ STATE.settings=d.settings; try{ localStorage.setItem(SK.ST,JSON.stringify(d.settings)); }catch(e){} }
-        STATE.dataLoaded=true;
-        saveCRMToStorage(); saveEntriesToStorage();
-        populateClientLinkDropdown();
-        if(STATE.currentTab==='dashboard') renderDashboard();
-        if(STATE.currentTab==='crm') renderCrmList();
-        if(STATE.currentTab==='reports') renderReports();
-        if(onComplete) onComplete(true);
-      } else { if(onComplete) onComplete(false); }
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success) { if (onSuccess) onSuccess(data); }
+      else {
+        showToast('error', 'এন্ট্রি সংরক্ষণ করা যায়নি', data.error || 'অজানা সমস্যা');
+        if (onError) onError(data);
+      }
     })
-    .catch(function(){ if(onComplete) onComplete(false); });
+    .catch(function (err) {
+      showToast('error', 'নেটওয়ার্ক সমস্যা', 'ইন্টারনেট চেক করো এবং আবার চেষ্টা করো।');
+      if (onError) onError(err);
+    });
 }
 
-// ── TAB NAV ──
-var TAB_SUBTITLES={entry:'এন্ট্রি',dashboard:'Dashboard',crm:'CRM',reports:'Reports',news:'News Briefing'};
-function switchTab(t) {
-  STATE.currentTab=t;
-  document.querySelectorAll('.tab-page').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('page-'+t).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.toggle('active',b.dataset.tab===t); });
-  document.getElementById('pageHeaderSubtitle').textContent=TAB_SUBTITLES[t]||'';
-  document.getElementById('crmFabAdd').style.display=(t==='crm')?'flex':'none';
-  if(t==='dashboard') renderDashboard();
-  if(t==='crm') renderCrmList();
-  if(t==='reports') renderReports();
-  if(t==='news'&&!STATE.newsLoadedOnce){ STATE.newsLoadedOnce=true; loadNewsBriefing(); }
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-document.querySelectorAll('.nav-btn').forEach(function(b){ b.addEventListener('click',function(){ switchTab(b.dataset.tab); }); });
+// ════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ════════════════════════════════════════════════════════════
 
-// ── SERVICE WORKER ──
-if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('./sw.js').catch(function(e){ console.warn(e); }); }); }
+var TAB_SUBTITLES = {
+  entry: 'এন্ট্রি', dashboard: 'Dashboard', crm: 'CRM',
+  reports: 'Reports', news: 'News Briefing'
+};
 
-// ── ENTRY FORM ──
-function selectType(type) {
-  STATE.currentType=type; var cfg=TYPE_CONFIG[type];
-  document.querySelectorAll('.type-btn').forEach(function(b){ b.classList.remove('active-expense','active-income','active-savings'); });
-  var m={"খরচ":"btnTypeExpense","আয়":"btnTypeIncome","সঞ্চয়":"btnTypeSavings"};
-  document.getElementById(m[type]).classList.add('active-'+cfg.key);
-  var f=document.getElementById('entryForm'); f.classList.remove('show-expense','show-income','show-savings'); f.classList.add('show-'+cfg.key);
-  populateCategoryDropdown(cfg.key); updateCurrencyPrefix();
-}
-document.getElementById('btnTypeExpense').addEventListener('click',function(){ selectType('খরচ'); });
-document.getElementById('btnTypeIncome').addEventListener('click',function(){ selectType('আয়'); });
-document.getElementById('btnTypeSavings').addEventListener('click',function(){ selectType('সঞ্চয়'); });
+function switchTab(tabName) {
+  STATE.currentTab = tabName;
 
-function populateCategoryDropdown(key) {
-  var s=document.getElementById('entryCategory'); s.innerHTML='';
-  STATE.categories[key].forEach(function(c){ var o=document.createElement('option'); o.value=c; o.textContent=c; s.appendChild(o); });
-}
-function updateCurrencyPrefix() { document.getElementById('currencyPrefix').textContent=document.getElementById('entryCurrency').value==='USD'?'$':'৳'; }
-document.getElementById('entryCurrency').addEventListener('change',updateCurrencyPrefix);
+  document.querySelectorAll('.tab-page').forEach(function (p) { p.classList.remove('active'); });
+  document.getElementById('page-' + tabName).classList.add('active');
 
-function populateClientLinkDropdown() {
-  var s=document.getElementById('entryClientLink'); s.innerHTML='<option value="">— নির্বাচন করো (optional) —</option>';
-  STATE.clients.forEach(function(c){ var o=document.createElement('option'); o.value=c.id; o.textContent=c.name; s.appendChild(o); });
-}
-
-document.getElementById('entryDate').value=todayInputValue();
-
-document.getElementById('entryForm').addEventListener('submit',function(e){
-  e.preventDefault();
-  var amt=document.getElementById('entryAmount').value, cat=document.getElementById('entryCategory').value;
-  document.getElementById('entryAmount').classList.remove('error'); document.getElementById('errAmount').classList.remove('show');
-  document.getElementById('entryCategory').classList.remove('error'); document.getElementById('errCategory').classList.remove('show');
-  if(!STATE.currentType){ showToast('warning','ধরন নির্বাচন করো','খরচ, আয়, বা সঞ্চয় — একটি বেছে নাও।'); return; }
-  var hasErr=false;
-  if(!amt||parseFloat(amt)<=0){ document.getElementById('entryAmount').classList.add('error'); document.getElementById('errAmount').classList.add('show'); hasErr=true; }
-  if(!cat){ document.getElementById('entryCategory').classList.add('error'); document.getElementById('errCategory').classList.add('show'); hasErr=true; }
-  if(hasErr) return;
-  openReviewScreen({ type:STATE.currentType, amount:amt, currency:document.getElementById('entryCurrency').value,
-    category:cat, date:document.getElementById('entryDate').value, payment:document.getElementById('entryPayment').value,
-    member:document.getElementById('entryMember').value, clientId:document.getElementById('entryClientLink').value||'',
-    noteExpense:document.getElementById('noteExpenseField').value,
-    noteIncome:document.getElementById('noteIncomeField').value,
-    noteSavings:document.getElementById('noteSavingsField').value });
-});
-
-// ── REVIEW SCREEN ──
-var pendingEntry=null;
-function openReviewScreen(d) {
-  pendingEntry=d; var cfg=TYPE_CONFIG[d.type];
-  document.getElementById('reviewTypeLabel').textContent=cfg.icon+' '+cfg.label;
-  document.getElementById('reviewCurrencySymbol').textContent=d.currency==='USD'?'$':'৳';
-  document.getElementById('reviewAmountValue').textContent=Math.round(parseFloat(d.amount)).toLocaleString('en-US');
-  var h=''; h+=rRow('ধরন',cfg.label); h+=rRow('ক্যাটাগরি',d.category); h+=rRow('তারিখ',convertInputDateToDisplay(d.date));
-  h+=rRow('Payment',d.payment); h+=rRow('Member',d.member);
-  if(d.type==='খরচ'&&d.noteExpense) h+=rRow('বিবরণ',d.noteExpense);
-  if(d.type==='আয়'&&d.noteIncome) h+=rRow('বিস্তারিত',d.noteIncome);
-  if(d.type==='সঞ্চয়'&&d.noteSavings) h+=rRow('লক্ষ্য',d.noteSavings);
-  document.getElementById('reviewItemsList').innerHTML=h;
-  document.getElementById('reviewOverlay').classList.add('show');
-}
-function rRow(l,v){ return '<div class="review-item"><span class="review-item-label">'+l+'</span><span class="review-item-value">'+v+'</span></div>'; }
-function closeReviewScreen(){ document.getElementById('reviewOverlay').classList.remove('show'); }
-document.getElementById('reviewEditBtn').addEventListener('click',closeReviewScreen);
-document.getElementById('reviewConfirmBtn').addEventListener('click',function(){
-  if(!pendingEntry) return; var btn=this; btn.disabled=true; btn.textContent='সংরক্ষণ হচ্ছে...';
-  callBackend({ action:'entry', type:pendingEntry.type, category:pendingEntry.category,
-    amount:parseFloat(pendingEntry.amount), currency:pendingEntry.currency,
-    date:convertInputDateToDisplay(pendingEntry.date), payment:pendingEntry.payment,
-    member:pendingEntry.member, clientId:pendingEntry.clientId,
-    noteExpense:pendingEntry.noteExpense, noteIncome:pendingEntry.noteIncome, noteSavings:pendingEntry.noteSavings },
-  function(data){
-    closeReviewScreen();
-    // ★ LOCAL STATE UPDATE — Dashboard তাৎক্ষণিক দেখাবে
-    var rate=STATE.settings.usdRate||110;
-    var raw=parseFloat(pendingEntry.amount)||0;
-    var bdt=pendingEntry.currency==='USD'?raw*rate:raw;
-    var cat=pendingEntry.category;
-    if(pendingEntry.type==='খরচ'){
-      STATE.entrySummary.expense+=bdt;
-      if(!STATE.entrySummary.byCategory[cat]) STATE.entrySummary.byCategory[cat]={type:'expense',amountBDT:0};
-      STATE.entrySummary.byCategory[cat].amountBDT+=bdt;
-    } else if(pendingEntry.type==='আয়'){
-      STATE.entrySummary.income+=bdt;
-      if(!STATE.entrySummary.byCategory[cat]) STATE.entrySummary.byCategory[cat]={type:'income',amountBDT:0};
-      STATE.entrySummary.byCategory[cat].amountBDT+=bdt;
-    } else if(pendingEntry.type==='সঞ্চয়'){
-      STATE.entrySummary.savings+=bdt;
-    }
-    saveEntriesToStorage();
-    showToast('success','এন্ট্রি সফল!',data.message||'সংরক্ষিত হয়েছে।');
-    resetEntryForm(); btn.disabled=false; btn.textContent='✓ নিশ্চিত করুন';
-  }, function(){ btn.disabled=false; btn.textContent='✓ নিশ্চিত করুন'; });
-});
-function resetEntryForm(){ document.getElementById('entryForm').reset(); document.getElementById('entryDate').value=todayInputValue(); if(STATE.currentType) selectType(STATE.currentType); }
-
-// ── CATEGORY MODAL ──
-function openCategoryModal() {
-  if(!STATE.currentType){ showToast('warning','প্রথমে ধরন বেছে নাও','খরচ/আয়/সঞ্চয় — একটি select করো।'); return; }
-  var cfg=TYPE_CONFIG[STATE.currentType];
-  document.getElementById('categoryModalTitle').textContent=cfg.label+'এর ক্যাটাগরি';
-  renderCategoryListModal(cfg.key);
-  document.getElementById('categoryModal').classList.add('show');
-}
-function renderCategoryListModal(key) {
-  var c=document.getElementById('categoryListModal'); c.innerHTML='';
-  STATE.categories[key].forEach(function(cat,idx){
-    var item=document.createElement('div'); item.className='category-item-modal';
-    item.innerHTML='<span>'+cat+'</span><button class="cat-delete-btn" data-idx="'+idx+'">🗑️</button>';
-    c.appendChild(item);
+  document.querySelectorAll('.nav-btn').forEach(function (b) {
+    b.classList.toggle('active', b.dataset.tab === tabName);
   });
-  c.querySelectorAll('.cat-delete-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      STATE.categories[key].splice(parseInt(btn.dataset.idx,10),1);
-      saveCategoriesToStorage(); renderCategoryListModal(key); populateCategoryDropdown(key);
+
+  document.getElementById('pageHeaderSubtitle').textContent = TAB_SUBTITLES[tabName] || '';
+
+  document.getElementById('crmFabAdd').style.display = (tabName === 'crm') ? 'flex' : 'none';
+
+  if (tabName === 'dashboard') renderDashboard();
+  if (tabName === 'crm') renderCrmList();
+  if (tabName === 'reports') renderReports();
+  if (tabName === 'news' && !STATE.newsLoadedOnce) { STATE.newsLoadedOnce = true; loadNewsBriefing(); }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.nav-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () { switchTab(btn.dataset.tab); });
+});
+
+// ════════════════════════════════════════════════════════════
+// SERVICE WORKER REGISTRATION
+// ════════════════════════════════════════════════════════════
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (err) {
+      console.warn('Service worker registration failed:', err);
     });
   });
 }
-document.getElementById('manageCategoryLink').addEventListener('click',openCategoryModal);
-document.getElementById('categoryModalClose').addEventListener('click',function(){ document.getElementById('categoryModal').classList.remove('show'); });
-document.getElementById('addCategoryBtn').addEventListener('click',function(){
-  var input=document.getElementById('newCategoryInput'); var val=input.value.trim(); if(!val) return;
-  var cfg=TYPE_CONFIG[STATE.currentType];
-  if(STATE.categories[cfg.key].indexOf(val)!==-1){ showToast('warning','ইতিমধ্যে আছে','এই ক্যাটাগরি আগেই আছে।'); return; }
-  STATE.categories[cfg.key].push(val); saveCategoriesToStorage(); renderCategoryListModal(cfg.key); populateCategoryDropdown(cfg.key); input.value='';
-});
 
-// ── DASHBOARD (★ সম্পূর্ণ নতুন) ──
-var monthLabelsBn=["","জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
-function getMonthKeyWithOffset(o){ var d=new Date(); d.setMonth(d.getMonth()+o); return {year:d.getFullYear(),month:d.getMonth()+1,key:d.getFullYear()+'-'+pad2(d.getMonth()+1)}; }
 
-function renderDashboard() {
-  var mk=getMonthKeyWithOffset(0);
-  document.getElementById('dashboardMonthLabel').textContent=monthLabelsBn[mk.month]+' '+mk.year;
-  var inc=STATE.entrySummary.income||0, exp=STATE.entrySummary.expense||0, sav=STATE.entrySummary.savings||0;
-  var net=inc-exp-sav;
-  document.getElementById('netBalanceValue').textContent=formatBDT(net);
-  var banner=document.getElementById('netBalanceBanner'); banner.className='net-balance-banner '+(net>=0?'positive':'negative');
-  document.getElementById('statTotalIncome').textContent=formatBDT(inc);
-  document.getElementById('statTotalExpense').textContent=formatBDT(exp);
-  document.getElementById('statTotalSavings').textContent=formatBDT(sav);
-  var goal=STATE.settings.incomeGoal||150000;
-  var gPct=goal>0?Math.min(Math.round((inc/goal)*100),100):0;
-  document.getElementById('incomeGoalBar').style.width=gPct+'%';
-  document.getElementById('incomeGoalText').textContent='Goal-এর '+gPct+'% অর্জিত ('+formatBDT(goal)+')';
-  var bud=STATE.settings.expenseBudget||60000;
-  var bPct=bud>0?Math.min(Math.round((exp/bud)*100),100):0;
-  var bar=document.getElementById('expenseBudgetBar'); bar.style.width=bPct+'%';
-  bar.style.background=bPct>=100?'#FF4444':(bPct>=80?'#F5A623':'');
-  document.getElementById('expenseBudgetText').textContent='বাজেটের '+bPct+'% ব্যবহৃত ('+formatBDT(bud)+')';
-  var sRate=inc>0?Math.round((sav/inc)*100):0;
-  document.getElementById('savingsRateText').textContent='Savings Rate: '+sRate+'%';
-  renderCatBreakdown('expenseCategoryBreakdown','expense',exp);
-  renderCatBreakdown('incomeCategoryBreakdown','income',inc);
-  var usd=STATE.settings.usdRate||110;
-  var active=STATE.clients.filter(function(c){ return c.status==='Active'; });
-  var mrr=0; active.forEach(function(c){ mrr+=(c.currency==='USD'?c.retainer*usd:c.retainer); });
-  var leads=STATE.pipeline.filter(function(p){ return p.stage!=='Won'&&p.stage!=='Lost'; });
-  var pVal=0; leads.forEach(function(p){ pVal+=parseFloat(p.estimatedValue)||0; });
-  var risk=STATE.clients.filter(function(c){ return c.healthScore&&(c.healthScore.includes('🔴')||c.healthScore.includes('⚠️')); });
-  document.getElementById('dashActiveClients').textContent=active.length;
-  document.getElementById('dashMRR').textContent=formatBDT(mrr)+'/mo';
-  document.getElementById('dashOpenLeads').textContent=leads.length;
-  document.getElementById('dashPipelineValue').textContent='$'+Math.round(pVal).toLocaleString('en-US');
-  document.getElementById('dashAtRisk').textContent=risk.length;
+// ════════════════════════════════════════════════════════════
+// TAB 1 — এন্ট্রি FORM LOGIC
+// ════════════════════════════════════════════════════════════
+
+function selectType(type) {
+  STATE.currentType = type;
+  var cfg = TYPE_CONFIG[type];
+
+  document.querySelectorAll('.type-btn').forEach(function (b) {
+    b.classList.remove('active-expense', 'active-income', 'active-savings');
+  });
+  var btnMap = { "খরচ": "btnTypeExpense", "আয়": "btnTypeIncome", "সঞ্চয়": "btnTypeSavings" };
+  document.getElementById(btnMap[type]).classList.add('active-' + cfg.key);
+
+  var form = document.getElementById('entryForm');
+  form.classList.remove('show-expense', 'show-income', 'show-savings');
+  form.classList.add('show-' + cfg.key);
+
+  populateCategoryDropdown(cfg.key);
+
+  // Currency prefix update হবে currency dropdown change হলে — কিন্তু default রিসেট করি
+  updateCurrencyPrefix();
 }
 
-function renderCatBreakdown(id,type,total) {
-  var c=document.getElementById(id); var by=STATE.entrySummary.byCategory||{};
-  var items=Object.keys(by).filter(function(k){ return by[k].type===type&&by[k].amountBDT>0; });
-  if(items.length===0){ c.innerHTML='<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এই মাসে কোনো '+(type==='expense'?'খরচ':'আয়')+'ের এন্ট্রি নেই</div></div>'; return; }
-  items.sort(function(a,b){ return by[b].amountBDT-by[a].amountBDT; });
-  var h=''; items.forEach(function(k){ var pct=total>0?Math.round((by[k].amountBDT/total)*100):0; h+='<div class="cat-breakdown-row"><span class="cat-breakdown-name">'+k+'</span><span class="cat-breakdown-amount">'+formatBDT(by[k].amountBDT)+' ('+pct+'%)</span></div>'; });
-  c.innerHTML=h;
+document.getElementById('btnTypeExpense').addEventListener('click', function () { selectType('খরচ'); });
+document.getElementById('btnTypeIncome').addEventListener('click', function () { selectType('আয়'); });
+document.getElementById('btnTypeSavings').addEventListener('click', function () { selectType('সঞ্চয়'); });
+
+function populateCategoryDropdown(categoryKey) {
+  var select = document.getElementById('entryCategory');
+  select.innerHTML = '';
+  STATE.categories[categoryKey].forEach(function (cat) {
+    var opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    select.appendChild(opt);
+  });
 }
 
-document.getElementById('refreshDashboardBtn').addEventListener('click',function(){
-  showToast('info','Sync হচ্ছে...','Sheet থেকে latest data আনা হচ্ছে।');
-  fetchDataFromSheet(getCurrentMonthKey(),function(ok){ if(ok) renderDashboard(); });
-});
+function updateCurrencyPrefix() {
+  var currency = document.getElementById('entryCurrency').value;
+  document.getElementById('currencyPrefix').textContent = currency === 'USD' ? '$' : '৳';
+}
+document.getElementById('entryCurrency').addEventListener('change', updateCurrencyPrefix);
 
-// ── CRM ──
-document.querySelectorAll('.crm-subtab-btn').forEach(function(btn){
-  btn.addEventListener('click',function(){
-    STATE.currentCrmTab=btn.dataset.crmtab;
-    document.querySelectorAll('.crm-subtab-btn').forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active');
-    document.querySelectorAll('.crm-subpage').forEach(function(p){ p.style.display='none'; });
-    document.getElementById('crm-'+STATE.currentCrmTab).style.display='block';
+// Populate Client Link dropdown (income only) from cached CLIENTS data
+function populateClientLinkDropdown() {
+  var select = document.getElementById('entryClientLink');
+  select.innerHTML = '<option value="">— নির্বাচন করো (optional) —</option>';
+  STATE.clients.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name;
+    select.appendChild(opt);
+  });
+}
+
+// Set today's date as default on load
+document.getElementById('entryDate').value = todayInputValue();
+
+// ── FORM SUBMIT → opens Review screen (does NOT save yet) ──
+document.getElementById('entryForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  var amount = document.getElementById('entryAmount').value;
+  var category = document.getElementById('entryCategory').value;
+  var currency = document.getElementById('entryCurrency').value;
+  var dateVal = document.getElementById('entryDate').value;
+  var payment = document.getElementById('entryPayment').value;
+  var member = document.getElementById('entryMember').value;
+
+  var hasError = false;
+  document.getElementById('entryAmount').classList.remove('error');
+  document.getElementById('errAmount').classList.remove('show');
+  document.getElementById('entryCategory').classList.remove('error');
+  document.getElementById('errCategory').classList.remove('show');
+
+  if (!STATE.currentType) {
+    showToast('warning', 'ধরন নির্বাচন করো', 'খরচ, আয়, বা সঞ্চয় — একটি বেছে নাও।');
+    return;
+  }
+  if (!amount || parseFloat(amount) <= 0) {
+    document.getElementById('entryAmount').classList.add('error');
+    document.getElementById('errAmount').classList.add('show');
+    hasError = true;
+  }
+  if (!category) {
+    document.getElementById('entryCategory').classList.add('error');
+    document.getElementById('errCategory').classList.add('show');
+    hasError = true;
+  }
+  if (hasError) return;
+
+  openReviewScreen({
+    type: STATE.currentType,
+    amount: amount,
+    currency: currency,
+    category: category,
+    date: dateVal,
+    payment: payment,
+    member: member,
+    clientId: document.getElementById('entryClientLink').value || '',
+    noteExpense: document.getElementById('noteExpenseField').value,
+    noteIncome: document.getElementById('noteIncomeField').value,
+    noteSavings: document.getElementById('noteSavingsField').value
   });
 });
-function renderCrmList(){ renderClientsList(); renderPipelineList(); renderProjectsList(); }
-function renderClientsList(){
-  var c=document.getElementById('clientsList');
-  if(!STATE.clients.length){ c.innerHTML='<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">এখনো কোনো client যুক্ত হয়নি।</div></div>'; return; }
-  var h=''; STATE.clients.forEach(function(cl){ var sc=cl.status==='Active'?'active':(cl.status==='Paused'?'paused':'churned'); h+='<div class="crm-item-card"><div class="crm-item-top"><div><div class="crm-item-name">'+cl.name+'</div><div class="crm-item-sub">'+(cl.service||'')+' · '+(cl.country||'')+'</div></div><span class="status-pill '+sc+'">'+cl.status+'</span></div><div class="crm-item-meta"><span class="crm-item-sub">'+(cl.contactName||'—')+'</span><span class="crm-item-value">'+formatCurrency(cl.retainer,cl.currency)+'/mo</span></div></div>'; }); c.innerHTML=h;
-}
-function renderPipelineList(){
-  var c=document.getElementById('pipelineList');
-  if(!STATE.pipeline.length){ c.innerHTML='<div class="empty-state"><div class="empty-state-icon">🎯</div><div class="empty-state-text">এখনো কোনো lead যুক্ত হয়নি।</div></div>'; return; }
-  var h=''; STATE.pipeline.forEach(function(p){ var sc=(p.stage||'').toLowerCase().replace(/\s+/g,''); h+='<div class="crm-item-card"><div class="crm-item-top"><div><div class="crm-item-name">'+p.company+'</div><div class="crm-item-sub">'+(p.serviceInterest||'')+' · '+(p.country||'')+'</div></div><span class="stage-pill '+sc+'">'+p.stage+'</span></div><div class="crm-item-meta"><span class="crm-item-sub">'+(p.contactPerson||'—')+' · '+(p.probability||0)+'%</span><span class="crm-item-value">$'+Math.round(p.estimatedValue||0).toLocaleString('en-US')+'</span></div></div>'; }); c.innerHTML=h;
-}
-function renderProjectsList(){
-  var c=document.getElementById('projectsList');
-  if(!STATE.projects.length){ c.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">এখনো কোনো project যুক্ত হয়নি।</div></div>'; return; }
-  var h=''; STATE.projects.forEach(function(p){ h+='<div class="crm-item-card"><div class="crm-item-top"><div><div class="crm-item-name">'+p.name+'</div><div class="crm-item-sub">'+(p.serviceType||'')+' · '+(p.phase||'')+'</div></div><span class="status-pill active">'+(p.status||'')+'</span></div><div class="progress-track"><div class="progress-fill indigo" style="width:'+(p.completionPct||0)+'%"></div></div><div class="crm-item-meta"><span class="crm-item-sub">Deadline: '+(p.deadline||'—')+'</span><span class="crm-item-sub">'+(p.completionPct||0)+'%</span></div></div>'; }); c.innerHTML=h;
+
+// ════════════════════════════════════════════════════════════
+// REVIEW SCREEN
+// ════════════════════════════════════════════════════════════
+
+var pendingEntry = null;
+
+function openReviewScreen(entryData) {
+  pendingEntry = entryData;
+  var cfg = TYPE_CONFIG[entryData.type];
+
+  document.getElementById('reviewTypeLabel').textContent = cfg.icon + ' ' + cfg.label;
+  document.getElementById('reviewCurrencySymbol').textContent = entryData.currency === 'USD' ? '$' : '৳';
+  document.getElementById('reviewAmountValue').textContent = Math.round(parseFloat(entryData.amount)).toLocaleString('en-US');
+
+  var itemsHtml = '';
+  itemsHtml += reviewItemRow('ধরন', cfg.label);
+  itemsHtml += reviewItemRow('ক্যাটাগরি', entryData.category);
+  itemsHtml += reviewItemRow('তারিখ', convertInputDateToDisplay(entryData.date));
+  itemsHtml += reviewItemRow('Payment', entryData.payment);
+  itemsHtml += reviewItemRow('Member', entryData.member);
+
+  if (entryData.type === 'খরচ' && entryData.noteExpense) itemsHtml += reviewItemRow('বিবরণ', entryData.noteExpense);
+  if (entryData.type === 'আয়' && entryData.noteIncome) itemsHtml += reviewItemRow('বিস্তারিত', entryData.noteIncome);
+  if (entryData.type === 'সঞ্চয়' && entryData.noteSavings) itemsHtml += reviewItemRow('লক্ষ্য', entryData.noteSavings);
+
+  document.getElementById('reviewItemsList').innerHTML = itemsHtml;
+  document.getElementById('reviewOverlay').classList.add('show');
 }
 
-document.getElementById('crmFabAdd').addEventListener('click',function(){
-  var modal=document.getElementById('crmAddModal');
-  document.querySelectorAll('.crm-form').forEach(function(f){ f.style.display='none'; });
-  if(STATE.currentCrmTab==='clients'){ document.getElementById('crmModalTitle').textContent='নতুন Client যুক্ত করো'; document.getElementById('clientAddForm').style.display='block'; }
-  else if(STATE.currentCrmTab==='pipeline'){ document.getElementById('crmModalTitle').textContent='নতুন Lead যুক্ত করো'; document.getElementById('pipelineAddForm').style.display='block'; }
-  else { document.getElementById('crmModalTitle').textContent='নতুন Project যুক্ত করো'; populateProjectClientDropdown(); document.getElementById('projectAddForm').style.display='block'; }
+function reviewItemRow(label, value) {
+  return '<div class="review-item"><span class="review-item-label">' + label + '</span><span class="review-item-value">' + value + '</span></div>';
+}
+
+function closeReviewScreen() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+}
+
+document.getElementById('reviewEditBtn').addEventListener('click', closeReviewScreen);
+
+document.getElementById('reviewConfirmBtn').addEventListener('click', function () {
+  if (!pendingEntry) return;
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = 'সংরক্ষণ হচ্ছে...';
+
+  var payload = {
+    action: 'entry',
+    type: pendingEntry.type,
+    category: pendingEntry.category,
+    amount: parseFloat(pendingEntry.amount),
+    currency: pendingEntry.currency,
+    date: convertInputDateToDisplay(pendingEntry.date),
+    payment: pendingEntry.payment,
+    member: pendingEntry.member,
+    clientId: pendingEntry.clientId,
+    noteExpense: pendingEntry.noteExpense,
+    noteIncome: pendingEntry.noteIncome,
+    noteSavings: pendingEntry.noteSavings
+  };
+
+  callBackend(payload,
+    function (data) {
+      closeReviewScreen();
+      showToast('success', 'এন্ট্রি সফল!', data.message || 'সংরক্ষিত হয়েছে।');
+      resetEntryForm();
+      btn.disabled = false;
+      btn.textContent = '✓ নিশ্চিত করুন';
+    },
+    function () {
+      btn.disabled = false;
+      btn.textContent = '✓ নিশ্চিত করুন';
+    }
+  );
+});
+
+function resetEntryForm() {
+  document.getElementById('entryForm').reset();
+  document.getElementById('entryDate').value = todayInputValue();
+  if (STATE.currentType) selectType(STATE.currentType); // field visibility ঠিক রাখার জন্য reset পরে আবার call করা আবশ্যক
+}
+
+// ════════════════════════════════════════════════════════════
+// CATEGORY MANAGER MODAL
+// ════════════════════════════════════════════════════════════
+
+function openCategoryModal() {
+  if (!STATE.currentType) {
+    showToast('warning', 'প্রথমে ধরন বেছে নাও', 'খরচ/আয়/সঞ্চয় — একটি select করো।');
+    return;
+  }
+  var cfg = TYPE_CONFIG[STATE.currentType];
+  document.getElementById('categoryModalTitle').textContent = cfg.label + 'এর ক্যাটাগরি';
+  renderCategoryListModal(cfg.key);
+  document.getElementById('categoryModal').classList.add('show');
+}
+
+function renderCategoryListModal(categoryKey) {
+  var container = document.getElementById('categoryListModal');
+  container.innerHTML = '';
+  STATE.categories[categoryKey].forEach(function (cat, idx) {
+    var item = document.createElement('div');
+    item.className = 'category-item-modal';
+    item.innerHTML = '<span>' + cat + '</span><button class="cat-delete-btn" data-idx="' + idx + '">🗑️</button>';
+    container.appendChild(item);
+  });
+
+  container.querySelectorAll('.cat-delete-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var idx = parseInt(btn.dataset.idx, 10);
+      STATE.categories[categoryKey].splice(idx, 1);
+      saveCategoriesToStorage();
+      renderCategoryListModal(categoryKey);
+      populateCategoryDropdown(categoryKey);
+    });
+  });
+}
+
+document.getElementById('manageCategoryLink').addEventListener('click', openCategoryModal);
+document.getElementById('categoryModalClose').addEventListener('click', function () {
+  document.getElementById('categoryModal').classList.remove('show');
+});
+
+document.getElementById('addCategoryBtn').addEventListener('click', function () {
+  var input = document.getElementById('newCategoryInput');
+  var val = input.value.trim();
+  if (!val) return;
+  var cfg = TYPE_CONFIG[STATE.currentType];
+  if (STATE.categories[cfg.key].indexOf(val) !== -1) {
+    showToast('warning', 'ইতিমধ্যে আছে', 'এই ক্যাটাগরি আগেই যুক্ত করা আছে।');
+    return;
+  }
+  STATE.categories[cfg.key].push(val);
+  saveCategoriesToStorage();
+  renderCategoryListModal(cfg.key);
+  populateCategoryDropdown(cfg.key);
+  input.value = '';
+});
+
+// ════════════════════════════════════════════════════════════
+// TAB 2 — DASHBOARD RENDERING
+// ════════════════════════════════════════════════════════════
+//
+// নোট: Part 1-এর Code.gs ইতিমধ্যে Dashboard tab-এ পুরো summary লিখে রাখে
+// (refreshDashboard ফাংশন)। এই PWA-তে আমরা সরাসরি Sheets API দিয়ে Dashboard
+// tab পড়তে পারি না (Apps Script Web App শুধু doPost/doGet handle করে),
+// তাই Dashboard ভিউ এখানে client-side cached entry/CRM data থেকে নিজে
+// calculate করে দেখানো হয় — Google Sheet-এর Dashboard tab-ও সমান্তরালে
+// একই হিসাব রাখে (backend থেকে), দুটো জায়গায় same numbers থাকবে।
+//
+// বাস্তব ব্যবহারে: তুমি যখনই entry/CRM data সংরক্ষণ করবে, doPost() নিজে
+// refreshDashboard() trigger করে — তাই Google Sheet-এর Dashboard tab সবসময়
+// up-to-date থাকে, এই PWA view টা সেই হিসাবের mobile-friendly প্রতিচ্ছবি মাত্র।
+
+var monthLabelsBn = ["", "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
+  "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+
+function getMonthKeyWithOffset(offset) {
+  var d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return { year: d.getFullYear(), month: d.getMonth() + 1, key: d.getFullYear() + '-' + pad2(d.getMonth() + 1) };
+}
+
+function renderDashboard() {
+  var mk = getMonthKeyWithOffset(0);
+  document.getElementById('dashboardMonthLabel').textContent = monthLabelsBn[mk.month] + ' ' + mk.year;
+
+  // Demo/placeholder note: প্রকৃত entry data Part 1 backend-এ Google Sheets-এ আছে।
+  // এই PWA নিজে cached client-side summary দেখায় যদি কোনো entry এই session-এ করা হয়।
+  // প্রথমবার app খুললে সব শূন্য দেখাবে যতক্ষণ না entry দেওয়া হয় — এটাই প্রত্যাশিত।
+
+  showToast('info', 'Dashboard', 'লাইভ ডেটার জন্য Google Sheet-এর "Dashboard" ট্যাব দেখো — সেখানে backend থেকে স্বয়ংক্রিয়ভাবে আপডেট হয়।');
+}
+
+document.getElementById('refreshDashboardBtn').addEventListener('click', function () {
+  showToast('info', 'রিফ্রেশ হচ্ছে', 'Google Sheet-এর Dashboard ট্যাব প্রতিটি নতুন এন্ট্রির পর নিজেই আপডেট হয়।');
+  renderDashboard();
+});
+
+// ════════════════════════════════════════════════════════════
+// TAB 3 — CRM RENDERING (Clients / Pipeline / Projects)
+// ════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.crm-subtab-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    STATE.currentCrmTab = btn.dataset.crmtab;
+    document.querySelectorAll('.crm-subtab-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.querySelectorAll('.crm-subpage').forEach(function (p) { p.style.display = 'none'; });
+    document.getElementById('crm-' + STATE.currentCrmTab).style.display = 'block';
+  });
+});
+
+function renderCrmList() {
+  renderClientsList();
+  renderPipelineList();
+  renderProjectsList();
+}
+
+function renderClientsList() {
+  var container = document.getElementById('clientsList');
+  if (STATE.clients.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">এখনো কোনো client যুক্ত হয়নি।<br>নিচের + বাটনে ট্যাপ করে প্রথম client যুক্ত করো।</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.clients.forEach(function (c) {
+    var statusClass = c.status === 'Active' ? 'active' : (c.status === 'Paused' ? 'paused' : 'churned');
+    html += '<div class="crm-item-card">' +
+      '<div class="crm-item-top"><div><div class="crm-item-name">' + c.name + '</div>' +
+      '<div class="crm-item-sub">' + c.service + ' · ' + c.country + '</div></div>' +
+      '<span class="status-pill ' + statusClass + '">' + c.status + '</span></div>' +
+      '<div class="crm-item-meta"><span class="crm-item-sub">' + (c.contactName || '—') + '</span>' +
+      '<span class="crm-item-value">' + formatCurrency(c.retainer, c.currency) + '/mo</span></div>' +
+      '<div class="crm-item-actions">' +
+      '<button class="crm-action-btn" data-edit-client="' + c.id + '">✏️ Edit</button>' +
+      '<button class="crm-action-btn danger" data-delete-client="' + c.id + '" data-delete-name="' + c.name + '">🗑️ Delete</button>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-edit-client]').forEach(function (btn) {
+    btn.addEventListener('click', function () { openEditClientModal(btn.dataset.editClient); });
+  });
+  container.querySelectorAll('[data-delete-client]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openConfirmDelete('client', btn.dataset.deleteClient, btn.dataset.deleteName);
+    });
+  });
+}
+
+function renderPipelineList() {
+  var container = document.getElementById('pipelineList');
+  if (STATE.pipeline.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎯</div><div class="empty-state-text">এখনো কোনো lead যুক্ত হয়নি।<br>নিচের + বাটনে ট্যাপ করে প্রথম lead যুক্ত করো।</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.pipeline.forEach(function (p) {
+    var stageClass = p.stage.toLowerCase().replace(/\s+/g, '');
+    html += '<div class="crm-item-card">' +
+      '<div class="crm-item-top"><div><div class="crm-item-name">' + p.company + '</div>' +
+      '<div class="crm-item-sub">' + p.serviceInterest + ' · ' + p.country + '</div></div>' +
+      '<span class="stage-pill ' + stageClass + '">' + p.stage + '</span></div>' +
+      '<div class="crm-item-meta"><span class="crm-item-sub">' + (p.contactPerson || '—') + ' · ' + (p.probability || 0) + '%</span>' +
+      '<span class="crm-item-value">$' + Math.round(p.estimatedValue || 0).toLocaleString('en-US') + '</span></div>' +
+      '<div class="crm-item-actions">' +
+      '<button class="crm-action-btn" data-edit-lead="' + p.id + '">✏️ Edit</button>' +
+      '<button class="crm-action-btn danger" data-delete-lead="' + p.id + '" data-delete-name="' + p.company + '">🗑️ Delete</button>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-edit-lead]').forEach(function (btn) {
+    btn.addEventListener('click', function () { openEditPipelineModal(btn.dataset.editLead); });
+  });
+  container.querySelectorAll('[data-delete-lead]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openConfirmDelete('pipeline', btn.dataset.deleteLead, btn.dataset.deleteName);
+    });
+  });
+}
+
+function renderProjectsList() {
+  var container = document.getElementById('projectsList');
+  if (STATE.projects.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">এখনো কোনো project যুক্ত হয়নি।<br>একটি client active হওয়ার পর project যুক্ত করো।</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.projects.forEach(function (pr) {
+    html += '<div class="crm-item-card">' +
+      '<div class="crm-item-top"><div><div class="crm-item-name">' + pr.name + '</div>' +
+      '<div class="crm-item-sub">' + pr.serviceType + ' · ' + pr.phase + '</div></div>' +
+      '<span class="status-pill active">' + pr.status + '</span></div>' +
+      '<div class="progress-track"><div class="progress-fill indigo" style="width:' + (pr.completionPct || 0) + '%"></div></div>' +
+      '<div class="crm-item-meta"><span class="crm-item-sub">Deadline: ' + (pr.deadline || '—') + '</span>' +
+      '<span class="crm-item-sub">' + (pr.completionPct || 0) + '%</span></div>' +
+      '<div class="crm-item-actions">' +
+      '<button class="crm-action-btn" data-edit-project="' + pr.id + '">✏️ Edit</button>' +
+      '<button class="crm-action-btn danger" data-delete-project="' + pr.id + '" data-delete-name="' + pr.name + '">🗑️ Delete</button>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-edit-project]').forEach(function (btn) {
+    btn.addEventListener('click', function () { openEditProjectModal(btn.dataset.editProject); });
+  });
+  container.querySelectorAll('[data-delete-project]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openConfirmDelete('project', btn.dataset.deleteProject, btn.dataset.deleteName);
+    });
+  });
+}
+
+// ── FAB → opens correct add-modal based on active CRM sub-tab ──
+document.getElementById('crmFabAdd').addEventListener('click', function () {
+  var modal = document.getElementById('crmAddModal');
+  document.querySelectorAll('.crm-form').forEach(function (f) { f.style.display = 'none'; });
+
+  if (STATE.currentCrmTab === 'clients') {
+    document.getElementById('clientAddForm').reset();
+    document.getElementById('cliEditingId').value = '';
+    document.getElementById('crmModalTitle').textContent = 'নতুন Client যুক্ত করো';
+    document.getElementById('clientAddForm').querySelector('.btn-text').textContent = '✓ Client যুক্ত করো';
+    document.getElementById('clientAddForm').style.display = 'block';
+  } else if (STATE.currentCrmTab === 'pipeline') {
+    document.getElementById('pipelineAddForm').reset();
+    document.getElementById('plEditingId').value = '';
+    document.getElementById('crmModalTitle').textContent = 'নতুন Lead যুক্ত করো';
+    document.getElementById('pipelineAddForm').querySelector('.btn-text').textContent = '✓ Lead যুক্ত করো';
+    document.getElementById('pipelineAddForm').style.display = 'block';
+  } else {
+    document.getElementById('projectAddForm').reset();
+    document.getElementById('prEditingId').value = '';
+    document.getElementById('crmModalTitle').textContent = 'নতুন Project যুক্ত করো';
+    document.getElementById('projectAddForm').querySelector('.btn-text').textContent = '✓ Project যুক্ত করো';
+    populateProjectClientDropdown();
+    document.getElementById('projectAddForm').style.display = 'block';
+  }
   modal.classList.add('show');
 });
-document.getElementById('crmModalClose').addEventListener('click',function(){ document.getElementById('crmAddModal').classList.remove('show'); });
-function populateProjectClientDropdown(){ var s=document.getElementById('prClientId'); s.innerHTML='<option value="">— কোনো client নয় —</option>'; STATE.clients.forEach(function(c){ var o=document.createElement('option'); o.value=c.id; o.textContent=c.name; s.appendChild(o); }); }
 
-document.getElementById('clientAddForm').addEventListener('submit',function(e){
-  e.preventDefault(); var btn=this.querySelector('.btn-submit'); btn.disabled=true; btn.classList.add('loading');
-  var p={ action:'client_add', clientName:document.getElementById('cliName').value, businessType:document.getElementById('cliType').value, country:document.getElementById('cliCountry').value, service:document.getElementById('cliService').value, status:document.getElementById('cliStatus').value, setupFee:parseFloat(document.getElementById('cliSetupFee').value)||0, currency:document.getElementById('cliCurrency').value, retainer:parseFloat(document.getElementById('cliRetainer').value)||0, startDate:convertInputDateToDisplay(document.getElementById('cliStartDate').value), nextPaymentDue:convertInputDateToDisplay(document.getElementById('cliNextPay').value), contactName:document.getElementById('cliContactName').value, contactEmail:document.getElementById('cliContactEmail').value, whatsapp:document.getElementById('cliWhatsapp').value, notes:document.getElementById('cliNotes').value, healthScore:'🟢 Healthy' };
-  callBackend(p,function(d){ STATE.clients.push({id:d.clientId,name:p.clientName,service:p.service,country:p.country,status:p.status,contactName:p.contactName,retainer:p.retainer,currency:p.currency,healthScore:'🟢 Healthy'}); saveCRMToStorage(); document.getElementById('crmAddModal').classList.remove('show'); document.getElementById('clientAddForm').reset(); showToast('success','Client যুক্ত হয়েছে!',p.clientName); renderClientsList(); populateClientLinkDropdown(); btn.disabled=false; btn.classList.remove('loading'); },function(){ btn.disabled=false; btn.classList.remove('loading'); });
+document.getElementById('crmModalClose').addEventListener('click', function () {
+  document.getElementById('crmAddModal').classList.remove('show');
 });
 
-document.getElementById('pipelineAddForm').addEventListener('submit',function(e){
-  e.preventDefault(); var btn=this.querySelector('.btn-submit'); btn.disabled=true; btn.classList.add('loading');
-  var p={ action:'pipeline_add', companyName:document.getElementById('plCompany').value, contactPerson:document.getElementById('plContact').value, email:document.getElementById('plEmail').value, phone:document.getElementById('plPhone').value, country:document.getElementById('plCountry').value, serviceInterest:document.getElementById('plService').value, leadSource:document.getElementById('plSource').value, stage:document.getElementById('plStage').value, estimatedValue:parseFloat(document.getElementById('plValue').value)||0, firstContactDate:convertInputDateToDisplay(document.getElementById('plFirstContact').value), nextAction:document.getElementById('plNextAction').value, nextActionDate:convertInputDateToDisplay(document.getElementById('plNextDate').value), probability:parseFloat(document.getElementById('plProb').value)||0, notes:document.getElementById('plNotes').value };
-  callBackend(p,function(d){ STATE.pipeline.push({id:d.leadId,company:p.companyName,serviceInterest:p.serviceInterest,country:p.country,stage:p.stage,contactPerson:p.contactPerson,estimatedValue:p.estimatedValue,probability:p.probability}); saveCRMToStorage(); document.getElementById('crmAddModal').classList.remove('show'); document.getElementById('pipelineAddForm').reset(); showToast('success','Lead যুক্ত হয়েছে!',p.companyName); renderPipelineList(); btn.disabled=false; btn.classList.remove('loading'); },function(){ btn.disabled=false; btn.classList.remove('loading'); });
+function populateProjectClientDropdown() {
+  var select = document.getElementById('prClientId');
+  select.innerHTML = '<option value="">— কোনো client নয় —</option>';
+  STATE.clients.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name;
+    select.appendChild(opt);
+  });
+}
+
+// ── CLIENT ADD/EDIT SUBMIT (Part 4: dual-mode — cliEditingId খালি থাকলে Add, না হলে Update) ──
+document.getElementById('clientAddForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var editingId = document.getElementById('cliEditingId').value;
+  var isEdit = !!editingId;
+
+  var fields = {
+    name: document.getElementById('cliName').value,
+    businessType: document.getElementById('cliType').value,
+    country: document.getElementById('cliCountry').value,
+    service: document.getElementById('cliService').value,
+    status: document.getElementById('cliStatus').value,
+    setupFee: parseFloat(document.getElementById('cliSetupFee').value) || 0,
+    currency: document.getElementById('cliCurrency').value,
+    retainer: parseFloat(document.getElementById('cliRetainer').value) || 0,
+    startDate: convertInputDateToDisplay(document.getElementById('cliStartDate').value),
+    nextPaymentDue: convertInputDateToDisplay(document.getElementById('cliNextPay').value),
+    contactName: document.getElementById('cliContactName').value,
+    contactEmail: document.getElementById('cliContactEmail').value,
+    whatsapp: document.getElementById('cliWhatsapp').value,
+    notes: document.getElementById('cliNotes').value
+  };
+
+  var payload = Object.assign({}, fields, {
+    action: isEdit ? 'client_update' : 'client_add',
+    clientName: fields.name, // backend expects "clientName" key — fields.name is the frontend-friendly alias
+    healthScore: isEdit ? undefined : '🟢 Healthy'
+  });
+  if (isEdit) payload.clientId = editingId;
+
+  callBackend(payload, function (data) {
+    if (isEdit) {
+      var idx = STATE.clients.findIndex(function (c) { return c.id === editingId; });
+      if (idx !== -1) STATE.clients[idx] = Object.assign({ id: editingId }, fields);
+      showToast('success', 'Client আপডেট হয়েছে!', fields.name);
+    } else {
+      STATE.clients.push(Object.assign({ id: data.clientId, healthScore: '🟢 Healthy' }, fields));
+      showToast('success', 'Client যুক্ত হয়েছে!', fields.name);
+    }
+    document.getElementById('crmAddModal').classList.remove('show');
+    document.getElementById('clientAddForm').reset();
+    document.getElementById('cliEditingId').value = '';
+    renderClientsList();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
 });
 
-document.getElementById('projectAddForm').addEventListener('submit',function(e){
-  e.preventDefault(); var btn=this.querySelector('.btn-submit'); btn.disabled=true; btn.classList.add('loading');
-  var p={ action:'project_add', clientId:document.getElementById('prClientId').value, projectName:document.getElementById('prName').value, serviceType:document.getElementById('prService').value, status:document.getElementById('prStatus').value, startDate:convertInputDateToDisplay(document.getElementById('prStartDate').value), deadline:convertInputDateToDisplay(document.getElementById('prDeadline').value), completionPct:parseFloat(document.getElementById('prPct').value)||0, phase:document.getElementById('prPhase').value||'Discovery', deliverables:document.getElementById('prDeliverables').value, blockers:document.getElementById('prBlockers').value };
-  callBackend(p,function(d){ STATE.projects.push({id:d.projectId,name:p.projectName,serviceType:p.serviceType,status:p.status,phase:p.phase,completionPct:p.completionPct,deadline:p.deadline}); saveCRMToStorage(); document.getElementById('crmAddModal').classList.remove('show'); document.getElementById('projectAddForm').reset(); showToast('success','Project যুক্ত হয়েছে!',p.projectName); renderProjectsList(); btn.disabled=false; btn.classList.remove('loading'); },function(){ btn.disabled=false; btn.classList.remove('loading'); });
+function openEditClientModal(clientId) {
+  var c = STATE.clients.find(function (x) { return x.id === clientId; });
+  if (!c) { showToast('error', 'পাওয়া যায়নি', 'Client data লোড করা যায়নি।'); return; }
+
+  document.querySelectorAll('.crm-form').forEach(function (f) { f.style.display = 'none'; });
+  document.getElementById('cliEditingId').value = clientId;
+  document.getElementById('cliName').value = c.name || '';
+  document.getElementById('cliType').value = c.businessType || '';
+  document.getElementById('cliCountry').value = c.country || 'Bangladesh';
+  document.getElementById('cliService').value = c.service || '';
+  document.getElementById('cliStatus').value = c.status || 'Active';
+  document.getElementById('cliSetupFee').value = c.setupFee || '';
+  document.getElementById('cliCurrency').value = c.currency || 'USD';
+  document.getElementById('cliRetainer').value = c.retainer || '';
+  document.getElementById('cliContactName').value = c.contactName || '';
+  document.getElementById('cliContactEmail').value = c.contactEmail || '';
+  document.getElementById('cliWhatsapp').value = c.whatsapp || '';
+  document.getElementById('cliNotes').value = c.notes || '';
+  // তারিখ ফিল্ড DD/MM/YYYY display string থেকে input[type=date]-এর YYYY-MM-DD-এ ফিরিয়ে নিতে হবে
+  document.getElementById('cliStartDate').value = convertDisplayDateToInput(c.startDate);
+  document.getElementById('cliNextPay').value = convertDisplayDateToInput(c.nextPaymentDue);
+
+  document.getElementById('crmModalTitle').textContent = 'Client এডিট করো';
+  document.getElementById('clientAddForm').querySelector('.btn-text').textContent = '✓ পরিবর্তন সংরক্ষণ করো';
+  document.getElementById('clientAddForm').style.display = 'block';
+  document.getElementById('crmAddModal').classList.add('show');
+}
+
+// ── PIPELINE ADD/EDIT SUBMIT (Part 4: dual-mode) ──
+document.getElementById('pipelineAddForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var editingId = document.getElementById('plEditingId').value;
+  var isEdit = !!editingId;
+
+  var fields = {
+    company: document.getElementById('plCompany').value,
+    contactPerson: document.getElementById('plContact').value,
+    email: document.getElementById('plEmail').value,
+    phone: document.getElementById('plPhone').value,
+    country: document.getElementById('plCountry').value,
+    serviceInterest: document.getElementById('plService').value,
+    leadSource: document.getElementById('plSource').value,
+    stage: document.getElementById('plStage').value,
+    estimatedValue: parseFloat(document.getElementById('plValue').value) || 0,
+    firstContactDate: convertInputDateToDisplay(document.getElementById('plFirstContact').value),
+    nextAction: document.getElementById('plNextAction').value,
+    nextActionDate: convertInputDateToDisplay(document.getElementById('plNextDate').value),
+    probability: parseFloat(document.getElementById('plProb').value) || 0,
+    notes: document.getElementById('plNotes').value
+  };
+
+  var payload = Object.assign({}, fields, {
+    action: isEdit ? 'pipeline_update' : 'pipeline_add',
+    companyName: fields.company // backend column expects "companyName"
+  });
+  if (isEdit) payload.leadId = editingId;
+
+  callBackend(payload, function (data) {
+    if (isEdit) {
+      var idx = STATE.pipeline.findIndex(function (p) { return p.id === editingId; });
+      if (idx !== -1) STATE.pipeline[idx] = Object.assign({ id: editingId }, fields);
+      showToast('success', 'Lead আপডেট হয়েছে!', fields.company);
+    } else {
+      STATE.pipeline.push(Object.assign({ id: data.leadId }, fields));
+      showToast('success', 'Lead যুক্ত হয়েছে!', fields.company);
+    }
+    document.getElementById('crmAddModal').classList.remove('show');
+    document.getElementById('pipelineAddForm').reset();
+    document.getElementById('plEditingId').value = '';
+    renderPipelineList();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
 });
 
-// ── REPORTS (★ সম্পূর্ণ নতুন) ──
-document.getElementById('reportPrevMonth').addEventListener('click',function(){ STATE.reportMonthOffset-=1; renderReports(); });
-document.getElementById('reportNextMonth').addEventListener('click',function(){ if(STATE.reportMonthOffset<0){ STATE.reportMonthOffset+=1; renderReports(); } });
-function renderReports(){
-  var mk=getMonthKeyWithOffset(STATE.reportMonthOffset);
-  document.getElementById('reportMonthLabel').textContent=monthLabelsBn[mk.month]+' '+mk.year;
-  var sum=STATE.entrySummary; var inc=sum.income||0,exp=sum.expense||0,sav=sum.savings||0;
-  var mx=Math.max(inc,exp,sav,1);
-  document.getElementById('barIncome').style.width=Math.round((inc/mx)*100)+'%';
-  document.getElementById('barExpense').style.width=Math.round((exp/mx)*100)+'%';
-  document.getElementById('barSavings').style.width=Math.round((sav/mx)*100)+'%';
-  document.getElementById('barIncomeVal').textContent=inc>0?formatBDT(inc):'';
-  document.getElementById('barExpenseVal').textContent=exp>0?formatBDT(exp):'';
-  document.getElementById('barSavingsVal').textContent=sav>0?formatBDT(sav):'';
-  var net=inc-exp-sav;
-  var hl=document.getElementById('historyList');
-  if(inc===0&&exp===0&&sav===0){ hl.innerHTML='<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">এই মাসে কোনো entry নেই।<br>এন্ট্রি tab থেকে entry যোগ করো।</div></div>'; }
-  else { hl.innerHTML='<div class="cat-breakdown-row"><span class="cat-breakdown-name">💰 আয়</span><span class="cat-breakdown-amount" style="color:#4CAF50">'+formatBDT(inc)+'</span></div><div class="cat-breakdown-row"><span class="cat-breakdown-name">💸 খরচ</span><span class="cat-breakdown-amount" style="color:#FF6B6B">'+formatBDT(exp)+'</span></div><div class="cat-breakdown-row"><span class="cat-breakdown-name">🏦 সঞ্চয়</span><span class="cat-breakdown-amount" style="color:#F5A623">'+formatBDT(sav)+'</span></div><div class="cat-breakdown-row" style="border-top:1px solid rgba(79,70,229,0.2);padding-top:10px;margin-top:6px;"><span class="cat-breakdown-name" style="font-weight:700">🧮 নেট ব্যালেন্স</span><span class="cat-breakdown-amount" style="font-weight:700;color:'+(net>=0?'#4CAF50':'#FF6B6B')+'">'+formatBDT(net)+'</span></div>'; }
-  document.getElementById('reportActiveProjects').textContent=STATE.projects.filter(function(p){ return p.status!=='On Hold'; }).length;
-  document.getElementById('reportWonDeals').textContent=STATE.pipeline.filter(function(p){ return p.stage==='Won'; }).length;
-  document.getElementById('reportNewClients').textContent=STATE.clients.length;
-  document.getElementById('reportAvgHealth').textContent=STATE.clients.length>0?'🟢 Healthy':'—';
+function openEditPipelineModal(leadId) {
+  var p = STATE.pipeline.find(function (x) { return x.id === leadId; });
+  if (!p) { showToast('error', 'পাওয়া যায়নি', 'Lead data লোড করা যায়নি।'); return; }
+
+  document.querySelectorAll('.crm-form').forEach(function (f) { f.style.display = 'none'; });
+  document.getElementById('plEditingId').value = leadId;
+  document.getElementById('plCompany').value = p.company || '';
+  document.getElementById('plContact').value = p.contactPerson || '';
+  document.getElementById('plEmail').value = p.email || '';
+  document.getElementById('plPhone').value = p.phone || '';
+  document.getElementById('plCountry').value = p.country || 'Bangladesh';
+  document.getElementById('plService').value = p.serviceInterest || '';
+  document.getElementById('plSource').value = p.leadSource || 'LinkedIn';
+  document.getElementById('plStage').value = p.stage || 'New';
+  document.getElementById('plValue').value = p.estimatedValue || '';
+  document.getElementById('plProb').value = p.probability || '';
+  document.getElementById('plNextAction').value = p.nextAction || '';
+  document.getElementById('plNotes').value = p.notes || '';
+  document.getElementById('plFirstContact').value = convertDisplayDateToInput(p.firstContactDate);
+  document.getElementById('plNextDate').value = convertDisplayDateToInput(p.nextActionDate);
+
+  document.getElementById('crmModalTitle').textContent = 'Lead এডিট করো';
+  document.getElementById('pipelineAddForm').querySelector('.btn-text').textContent = '✓ পরিবর্তন সংরক্ষণ করো';
+  document.getElementById('pipelineAddForm').style.display = 'block';
+  document.getElementById('crmAddModal').classList.add('show');
 }
 
-// ── NEWS ──
-function loadNewsBriefing(){
-  document.getElementById('newsLoadingState').style.display='block';
-  document.getElementById('newsContentState').style.display='none';
-  document.getElementById('newsErrorState').style.display='none';
-  if(WEB_APP_URL==="YOUR_WEB_APP_URL_HERE"){ showNewsError('WEB_APP_URL বসানো হয়নি।'); return; }
-  fetch(WEB_APP_URL+'?action=get_news').then(function(r){ return r.json(); }).then(function(d){ if(d.success&&d.data) renderNewsBriefing(d.data); else showNewsError(d.error||'News পাওয়া যায়নি।'); }).catch(function(){ showNewsError('নেটওয়ার্ক সমস্যা।'); });
-}
-function showNewsError(m){ document.getElementById('newsLoadingState').style.display='none'; document.getElementById('newsContentState').style.display='none'; document.getElementById('newsErrorState').style.display='block'; document.getElementById('newsErrorText').textContent=m; }
-function renderNewsBriefing(d){
-  document.getElementById('newsLoadingState').style.display='none'; document.getElementById('newsErrorState').style.display='none'; document.getElementById('newsContentState').style.display='block';
-  document.getElementById('newsInternational').innerHTML=buildNewsCardsHtml(d.international,null);
-  document.getElementById('newsBangladesh').innerHTML=buildNewsCardsHtml(d.bangladesh,null);
-  document.getElementById('newsInterest').innerHTML=buildNewsCardsHtml(d.interests,'category');
-  if(d.interestLabels&&d.interestLabels.length>0) document.getElementById('newsInterestTitle').textContent='তোমার ইন্টারেস্ট ('+d.interestLabels.map(function(l){ return l.charAt(0).toUpperCase()+l.slice(1); }).join(', ')+')';
-  document.getElementById('newsUpdatedNote').textContent='সর্বশেষ আপডেট: '+(d.generatedAt||'—');
-}
-function buildNewsCardsHtml(items,tf){
-  if(!items||!items.length) return '<div class="empty-state" style="padding:24px;"><div class="empty-state-text">কোনো news পাওয়া যায়নি।</div></div>';
-  var h=''; items.forEach(function(item){ var tag=tf&&item[tf]?'<span class="news-card-tag">'+item[tf]+'</span>':'<span></span>'; h+='<div class="news-card"><div class="news-card-title">'+item.title+'</div><div class="news-card-footer">'+tag+'<a href="'+item.link+'" target="_blank" rel="noopener" class="news-card-link">পড়ুন →</a></div></div>'; }); return h;
-}
-document.getElementById('refreshNewsBtn').addEventListener('click',loadNewsBriefing);
+// ── PROJECT ADD/EDIT SUBMIT (Part 4: dual-mode) ──
+document.getElementById('projectAddForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
 
-// ── APP INIT (★ সম্পূর্ণ নতুন) ──
-function initApp(){
-  loadFromStorage();            // localStorage থেকে আগের data আনো
+  var editingId = document.getElementById('prEditingId').value;
+  var isEdit = !!editingId;
+
+  var fields = {
+    clientId: document.getElementById('prClientId').value,
+    name: document.getElementById('prName').value,
+    serviceType: document.getElementById('prService').value,
+    status: document.getElementById('prStatus').value,
+    startDate: convertInputDateToDisplay(document.getElementById('prStartDate').value),
+    deadline: convertInputDateToDisplay(document.getElementById('prDeadline').value),
+    completionPct: parseFloat(document.getElementById('prPct').value) || 0,
+    phase: document.getElementById('prPhase').value || 'Discovery',
+    deliverables: document.getElementById('prDeliverables').value,
+    blockers: document.getElementById('prBlockers').value
+  };
+
+  var payload = Object.assign({}, fields, {
+    action: isEdit ? 'project_update' : 'project_add',
+    projectName: fields.name // backend column expects "projectName"
+  });
+  if (isEdit) payload.projectId = editingId;
+
+  callBackend(payload, function (data) {
+    if (isEdit) {
+      var idx = STATE.projects.findIndex(function (p) { return p.id === editingId; });
+      if (idx !== -1) STATE.projects[idx] = Object.assign({ id: editingId }, fields);
+      showToast('success', 'Project আপডেট হয়েছে!', fields.name);
+    } else {
+      STATE.projects.push(Object.assign({ id: data.projectId }, fields));
+      showToast('success', 'Project যুক্ত হয়েছে!', fields.name);
+    }
+    document.getElementById('crmAddModal').classList.remove('show');
+    document.getElementById('projectAddForm').reset();
+    document.getElementById('prEditingId').value = '';
+    renderProjectsList();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+function openEditProjectModal(projectId) {
+  var pr = STATE.projects.find(function (x) { return x.id === projectId; });
+  if (!pr) { showToast('error', 'পাওয়া যায়নি', 'Project data লোড করা যায়নি।'); return; }
+
+  document.querySelectorAll('.crm-form').forEach(function (f) { f.style.display = 'none'; });
+  populateProjectClientDropdown();
+  document.getElementById('prEditingId').value = projectId;
+  document.getElementById('prClientId').value = pr.clientId || '';
+  document.getElementById('prName').value = pr.name || '';
+  document.getElementById('prService').value = pr.serviceType || '';
+  document.getElementById('prStatus').value = pr.status || 'Discovery';
+  document.getElementById('prPhase').value = pr.phase || '';
+  document.getElementById('prPct').value = pr.completionPct || '';
+  document.getElementById('prDeliverables').value = pr.deliverables || '';
+  document.getElementById('prBlockers').value = pr.blockers || '';
+  document.getElementById('prStartDate').value = convertDisplayDateToInput(pr.startDate);
+  document.getElementById('prDeadline').value = convertDisplayDateToInput(pr.deadline);
+
+  document.getElementById('crmModalTitle').textContent = 'Project এডিট করো';
+  document.getElementById('projectAddForm').querySelector('.btn-text').textContent = '✓ পরিবর্তন সংরক্ষণ করো';
+  document.getElementById('projectAddForm').style.display = 'block';
+  document.getElementById('crmAddModal').classList.add('show');
+}
+
+// ════════════════════════════════════════════════════════════
+// DELETE CONFIRMATION (Part 4) — custom modal, shared by all 3 CRM types
+// ════════════════════════════════════════════════════════════
+
+var pendingDelete = null; // { type: 'client'|'pipeline'|'project', id, name }
+
+function openConfirmDelete(type, id, name) {
+  pendingDelete = { type: type, id: id, name: name };
+  var labelMap = { client: 'Client', pipeline: 'Lead', project: 'Project' };
+  document.getElementById('confirmDeleteTitle').textContent = labelMap[type] + ' মুছে ফেলবে?';
+  document.getElementById('confirmDeleteMessage').innerHTML =
+    '<strong>' + name + '</strong>'+'-কে স্থায়ীভাবে মুছে ফেলা হবে। এই কাজটি ফিরিয়ে আনা যাবে না।';
+  document.getElementById('confirmDeleteModal').classList.add('show');
+}
+
+document.getElementById('confirmDeleteCancelBtn').addEventListener('click', function () {
+  document.getElementById('confirmDeleteModal').classList.remove('show');
+  pendingDelete = null;
+});
+
+document.getElementById('confirmDeleteConfirmBtn').addEventListener('click', function () {
+  if (!pendingDelete) return;
+  var btn = this;
+  btn.disabled = true;
+  btn.textContent = 'মুছে ফেলা হচ্ছে...';
+
+  var actionMap = { client: 'client_delete', pipeline: 'pipeline_delete', project: 'project_delete' };
+  var idFieldMap = { client: 'clientId', pipeline: 'leadId', project: 'projectId' };
+
+  var payload = { action: actionMap[pendingDelete.type] };
+  payload[idFieldMap[pendingDelete.type]] = pendingDelete.id;
+
+  callBackend(payload, function (data) {
+    if (pendingDelete.type === 'client') {
+      STATE.clients = STATE.clients.filter(function (c) { return c.id !== pendingDelete.id; });
+      renderClientsList();
+    } else if (pendingDelete.type === 'pipeline') {
+      STATE.pipeline = STATE.pipeline.filter(function (p) { return p.id !== pendingDelete.id; });
+      renderPipelineList();
+    } else {
+      STATE.projects = STATE.projects.filter(function (p) { return p.id !== pendingDelete.id; });
+      renderProjectsList();
+    }
+    showToast('success', 'মুছে ফেলা হয়েছে', pendingDelete.name);
+    document.getElementById('confirmDeleteModal').classList.remove('show');
+    btn.disabled = false;
+    btn.textContent = '🗑️ মুছে ফেলো';
+    pendingDelete = null;
+  }, function () {
+    btn.disabled = false;
+    btn.textContent = '🗑️ মুছে ফেলো';
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+// TAB 4 — REPORTS RENDERING (Part 4: real historical data, no placeholder)
+// ════════════════════════════════════════════════════════════
+
+document.getElementById('reportPrevMonth').addEventListener('click', function () {
+  STATE.reportMonthOffset -= 1;
+  renderReportsFromCache();
+});
+document.getElementById('reportNextMonth').addEventListener('click', function () {
+  if (STATE.reportMonthOffset < 0) {
+    STATE.reportMonthOffset += 1;
+    renderReportsFromCache();
+  }
+});
+
+/**
+ * doGet(?action=get_monthly_report) থেকে fetch করে।
+ * fetch() এখানে GET ব্যবহার করে (callBackend() শুধু POST করে, তাই আলাদা helper)।
+ */
+function fetchMonthlyReport(onSuccess) {
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+    showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি।');
+    return;
+  }
+  fetch(WEB_APP_URL + '?action=get_monthly_report&months=6')
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success) {
+        STATE.monthlyReportHistory = data.data; // [{monthKey, monthLabel, income, expense, savings, net}, ...] পুরনো → নতুন ক্রমে
+        onSuccess();
+      } else {
+        showToast('error', 'রিপোর্ট লোড করা যায়নি', data.error || 'অজানা সমস্যা');
+      }
+    })
+    .catch(function () {
+      showToast('error', 'নেটওয়ার্ক সমস্যা', 'রিপোর্ট ডেটা আনা যায়নি, ইন্টারনেট চেক করো।');
+    });
+}
+
+function renderReports() {
+  fetchMonthlyReport(renderReportsFromCache);
+}
+
+function renderReportsFromCache() {
+  var history = STATE.monthlyReportHistory || [];
+  if (history.length === 0) {
+    document.getElementById('reportMonthLabel').textContent = '—';
+    return;
+  }
+
+  // reportMonthOffset: 0 = সর্বশেষ মাস (array-এর শেষ item), -1 = তার আগের মাস, ইত্যাদি
+  var idx = history.length - 1 + STATE.reportMonthOffset;
+  idx = Math.max(0, Math.min(idx, history.length - 1));
+  var current = history[idx];
+
+  document.getElementById('reportMonthLabel').textContent = current.monthLabel;
+
+  var maxVal = Math.max(current.income, current.expense, current.savings, 1);
+  var incomePct = Math.round((current.income / maxVal) * 100);
+  var expensePct = Math.round((current.expense / maxVal) * 100);
+  var savingsPct = Math.round((current.savings / maxVal) * 100);
+
+  document.getElementById('barIncome').style.width = incomePct + '%';
+  document.getElementById('barIncomeVal').textContent = formatBDT(current.income);
+  document.getElementById('barExpense').style.width = expensePct + '%';
+  document.getElementById('barExpenseVal').textContent = formatBDT(current.expense);
+  document.getElementById('barSavings').style.width = savingsPct + '%';
+  document.getElementById('barSavingsVal').textContent = formatBDT(current.savings);
+
+  // History list — সাম্প্রতিক মাস উপরে
+  var historyHtml = '';
+  history.slice().reverse().forEach(function (m) {
+    historyHtml += '<div class="history-row">' +
+      '<span class="history-month">' + m.monthLabel + '</span>' +
+      '<div class="history-figures">' +
+      '<span class="hf-income">+' + formatBDT(m.income) + '</span>' +
+      '<span class="hf-expense">-' + formatBDT(m.expense) + '</span>' +
+      '<span class="hf-net" style="color:' + (m.net >= 0 ? 'var(--color-income)' : 'var(--color-expense)') + ';">' + formatBDT(m.net) + '</span>' +
+      '</div></div>';
+  });
+  document.getElementById('historyList').innerHTML = historyHtml || '<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">পর্যাপ্ত ডেটা এখনো নেই</div></div>';
+
+  // CRM Business Health card — STATE cache থেকে (এন্ট্রি/CRM করার পর session-এ আপডেট থাকে)
+  document.getElementById('reportActiveProjects').textContent = STATE.projects.filter(function (p) {
+    return p.status !== 'On Hold';
+  }).length;
+  document.getElementById('reportWonDeals').textContent = STATE.pipeline.filter(function (p) {
+    return p.stage === 'Won';
+  }).length;
+  document.getElementById('reportNewClients').textContent = STATE.clients.length;
+
+  var atRiskCount = STATE.clients.filter(function (c) {
+    return c.healthScore && (c.healthScore.indexOf('At Risk') !== -1 || c.healthScore.indexOf('Critical') !== -1);
+  }).length;
+  document.getElementById('reportAvgHealth').textContent =
+    STATE.clients.length === 0 ? '—' :
+    (atRiskCount === 0 ? '🟢 সব Healthy' : atRiskCount + ' জন ⚠️ Attention দরকার');
+}
+
+// ════════════════════════════════════════════════════════════
+// APP INIT — সব data load করে App চালু করে
+// ════════════════════════════════════════════════════════════
+
+function initApp() {
+  loadCategoriesFromStorage();
   updateHeaderClock();
-  setInterval(updateHeaderClock,30000);
+  setInterval(updateHeaderClock, 30000);
   updateOfflineBanner();
+
+  // Default type select করে দাও যাতে ফাঁকা state না থাকে
   selectType('খরচ');
   populateClientLinkDropdown();
+
   switchTab('entry');
-  // Background sync — 800ms পরে Sheet থেকে fresh data আনো
-  if(navigator.onLine){
-    setTimeout(function(){
-      fetchDataFromSheet(getCurrentMonthKey(),function(ok){
-        if(ok&&STATE.currentTab!=='entry'){
-          if(STATE.currentTab==='dashboard') renderDashboard();
-          if(STATE.currentTab==='crm') renderCrmList();
-          if(STATE.currentTab==='reports') renderReports();
-        }
-      });
-    },800);
-  }
 }
 
-document.addEventListener('DOMContentLoaded',initApp);
+// ════════════════════════════════════════════════════════════
+// TAB 5 — NEWS BRIEFING (Part 3)
+// ════════════════════════════════════════════════════════════
+
+function loadNewsBriefing() {
+  document.getElementById('newsLoadingState').style.display = 'block';
+  document.getElementById('newsContentState').style.display = 'none';
+  document.getElementById('newsErrorState').style.display = 'none';
+
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+    showNewsError('WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
+    return;
+  }
+
+  var url = WEB_APP_URL + '?action=get_news';
+
+  fetch(url)
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success && data.data) {
+        renderNewsBriefing(data.data);
+      } else {
+        showNewsError(data.error || 'News data পাওয়া যায়নি।');
+      }
+    })
+    .catch(function () {
+      showNewsError('নেটওয়ার্ক সমস্যা — ইন্টারনেট চেক করো এবং আবার চেষ্টা করো।');
+    });
+}
+
+function showNewsError(message) {
+  document.getElementById('newsLoadingState').style.display = 'none';
+  document.getElementById('newsContentState').style.display = 'none';
+  document.getElementById('newsErrorState').style.display = 'block';
+  document.getElementById('newsErrorText').textContent = message;
+}
+
+function renderNewsBriefing(newsData) {
+  document.getElementById('newsLoadingState').style.display = 'none';
+  document.getElementById('newsErrorState').style.display = 'none';
+  document.getElementById('newsContentState').style.display = 'block';
+
+  document.getElementById('newsInternational').innerHTML = buildNewsCardsHtml(newsData.international, null);
+  document.getElementById('newsBangladesh').innerHTML = buildNewsCardsHtml(newsData.bangladesh, null);
+  document.getElementById('newsInterest').innerHTML = buildNewsCardsHtml(newsData.interests, 'category');
+
+  if (newsData.interestLabels && newsData.interestLabels.length > 0) {
+    var labels = newsData.interestLabels.map(function (l) {
+      return l.charAt(0).toUpperCase() + l.slice(1);
+    }).join(', ');
+    document.getElementById('newsInterestTitle').textContent = 'তোমার ইন্টারেস্ট (' + labels + ')';
+  }
+
+  document.getElementById('newsUpdatedNote').textContent = 'সর্বশেষ আপডেট: ' + (newsData.generatedAt || '—');
+}
+
+function buildNewsCardsHtml(items, tagField) {
+  if (!items || items.length === 0) {
+    return '<div class="empty-state" style="padding:24px;"><div class="empty-state-text">এই সেকশনে কোনো news পাওয়া যায়নি।</div></div>';
+  }
+  var html = '';
+  items.forEach(function (item) {
+    var tag = tagField && item[tagField] ? '<span class="news-card-tag">' + item[tagField] + '</span>' : '<span></span>';
+    html += '<div class="news-card">' +
+      '<div class="news-card-title">' + item.title + '</div>' +
+      '<div class="news-card-footer">' + tag +
+      '<a href="' + item.link + '" target="_blank" rel="noopener" class="news-card-link">পড়ুন →</a></div></div>';
+  });
+  return html;
+}
+
+document.getElementById('refreshNewsBtn').addEventListener('click', loadNewsBriefing);
+
+document.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
 </html>
