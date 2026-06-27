@@ -8,7 +8,7 @@
 //   পুরনো cache auto-delete হবে, নতুন cache নেবে।
 // ============================================================
 
-var CACHE_NAME = 'aumatiq-pos-v3';
+var CACHE_NAME = 'aumatiq-pos-v4';
 
 var APP_SHELL_FILES = [
   './index.html',

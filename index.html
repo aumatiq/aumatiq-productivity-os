@@ -1603,7 +1603,7 @@ body {
 
 // ⚠️⚠️⚠️ এখানে তোমার Part 1-এর Web App URL বসাও ⚠️⚠️⚠️
 // Apps Script → Deploy → Web app → URL কপি করো
-var WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
+var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec";
 
 // ════════════════════════════════════════════════════════════
 // STATE — সব app-wide data এখানে রাখা হয়
@@ -1758,7 +1758,7 @@ window.addEventListener('offline', updateOfflineBanner);
 // ════════════════════════════════════════════════════════════
 
 function callBackend(payload, onSuccess, onError) {
-  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+  if (WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec") {
     showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
     if (onError) onError();
     return;
@@ -2574,7 +2574,7 @@ document.getElementById('reportNextMonth').addEventListener('click', function ()
  * fetch() এখানে GET ব্যবহার করে (callBackend() শুধু POST করে, তাই আলাদা helper)।
  */
 function fetchMonthlyReport(onSuccess) {
-  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+  if (WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec") {
     showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি।');
     return;
   }
@@ -2679,7 +2679,7 @@ function loadNewsBriefing() {
   document.getElementById('newsContentState').style.display = 'none';
   document.getElementById('newsErrorState').style.display = 'none';
 
-  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+  if (WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec") {
     showNewsError('WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
     return;
   }
