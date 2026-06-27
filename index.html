@@ -176,6 +176,16 @@ body {
   line-height: 1.4;
 }
 
+.header-settings-btn {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--indigo-dim); border: 1px solid var(--indigo-border);
+  color: var(--text-primary); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); flex-shrink: 0; -webkit-appearance: none;
+}
+.header-settings-btn:hover { background: rgba(79,70,229,0.22); }
+.header-settings-btn:active { transform: scale(0.94); }
+
 /* ── MAIN CONTENT WRAPPER ── */
 .app-main {
   max-width: 560px;
@@ -657,6 +667,98 @@ body {
 .crm-action-btn:hover { background: var(--indigo-dim); color: var(--text-primary); border-color: var(--indigo-border); }
 .crm-action-btn.danger:hover { background: rgba(255,107,107,0.1); color: var(--color-expense); border-color: rgba(255,107,107,0.4); }
 
+/* ============================================================
+   SETTINGS PANEL (Part 5) — full-screen overlay, slides from right
+   ============================================================ */
+
+.settings-panel {
+  position: fixed; inset: 0; z-index: 600; background: var(--bg-primary);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex; flex-direction: column;
+}
+.settings-panel.show { transform: translateX(0); }
+
+.settings-panel-header {
+  display: flex; align-items: center; gap: 12px; padding: 16px 18px;
+  border-bottom: 1px solid var(--border); background: var(--bg-overlay);
+  backdrop-filter: blur(16px); position: sticky; top: 0; z-index: 5;
+}
+.settings-panel-back {
+  width: 36px; height: 36px; border-radius: 9px; background: var(--bg-input);
+  border: 1px solid var(--border); color: var(--text-primary); font-size: 17px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; -webkit-appearance: none; transition: var(--transition);
+}
+.settings-panel-back:hover { background: var(--indigo-dim); }
+.settings-panel-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; }
+
+.settings-panel-body { flex: 1; overflow-y: auto; padding: 18px 16px 40px; max-width: 560px; margin: 0 auto; width: 100%; }
+
+.settings-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--indigo-light); margin: 24px 0 12px; display: block;
+}
+.settings-section-title:first-child { margin-top: 0; }
+
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 6px 0;
+}
+
+.toggle-switch {
+  position: relative; width: 48px; height: 26px; flex-shrink: 0; cursor: pointer;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0; background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 14px; transition: var(--transition);
+}
+.toggle-slider::before {
+  content: ''; position: absolute; width: 20px; height: 20px; left: 2px; top: 2px;
+  background: var(--text-muted); border-radius: 50%; transition: var(--transition);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--indigo); border-color: var(--indigo); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(21px); background: #fff; }
+
+/* ── Budget management list (inside Settings) ── */
+.budget-list-item {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 14px 16px; margin-bottom: 10px;
+}
+.budget-list-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.budget-list-cat { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.budget-list-amount { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--gold); }
+.budget-list-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+.btn-add-row {
+  width: 100%; padding: 13px; background: transparent; border: 1.5px dashed var(--border);
+  border-radius: var(--radius-md); color: var(--indigo-light); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: var(--transition); margin-top: 6px; -webkit-appearance: none;
+}
+.btn-add-row:hover { background: var(--indigo-dim); border-color: var(--indigo-border); }
+
+/* ── Entry history list (inside এন্ট্রি tab) ── */
+.entry-history-item {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 13px 15px; margin-bottom: 9px; cursor: pointer; transition: var(--transition);
+}
+.entry-history-item:hover { border-color: var(--indigo-border); }
+.entry-history-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.entry-history-cat { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.entry-history-amount { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
+.entry-history-amount.exp { color: var(--color-expense); }
+.entry-history-amount.inc { color: var(--color-income); }
+.entry-history-amount.sav { color: var(--gold); }
+.entry-history-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.entry-history-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+.history-toggle-link {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--indigo-light); cursor: pointer;
+  padding: 10px 0; margin-top: 4px;
+}
+.history-toggle-link:hover { color: var(--gold); }
+
 
 /* ============================================================
    DASHBOARD TAB
@@ -861,7 +963,10 @@ body {
       <span class="header-subtitle" id="pageHeaderSubtitle">এন্ট্রি</span>
     </div>
   </div>
-  <div class="header-time" id="headerClock">--/--/---- --:--</div>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="header-time" id="headerClock">--/--/---- --:--</div>
+    <button class="header-settings-btn" id="openSettingsBtn" aria-label="Settings" title="Settings">⚙️</button>
+  </div>
 </header>
 
 <!-- Offline banner — সব tab-এর জন্য shared -->
@@ -1003,6 +1108,14 @@ body {
         <span class="btn-spinner"><span class="spinner-circle"></span></span>
       </button>
     </form>
+
+    <!-- Part 5 — Entry History: আগের এন্ট্রি দেখা, এডিট, ডিলিট -->
+    <div class="history-toggle-link" id="historyToggleLink">
+      <span id="historyToggleIcon">▾</span> <span id="historyToggleText">সাম্প্রতিক এন্ট্রি দেখো</span>
+    </div>
+    <div id="entryHistorySection" style="display:none;">
+      <div id="entryHistoryList"></div>
+    </div>
 
     <p class="app-footer-note">সব এন্ট্রি Google Sheets-এ নিরাপদে সংরক্ষিত হয়। AUMATIQ Personal Productivity OS v1.0</p>
   </section>
@@ -1593,6 +1706,248 @@ body {
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SETTINGS PANEL (Part 5) — full-screen, সব configuration এখান থেকে -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-panel-header">
+    <button class="settings-panel-back" id="closeSettingsBtn">←</button>
+    <span class="settings-panel-title">⚙️ Settings</span>
+  </div>
+
+  <div class="settings-panel-body">
+
+    <!-- ── Profile ── -->
+    <span class="settings-section-title">প্রোফাইল</span>
+    <div class="form-group">
+      <label class="form-label">তোমার নাম</label>
+      <input type="text" class="form-input" id="setYourName" placeholder="AUMATIQ Admin">
+    </div>
+    <div class="form-group">
+      <label class="form-label">তোমার Email (Alert এখানে যাবে)</label>
+      <input type="email" class="form-input" id="setYourEmail" placeholder="you@gmail.com">
+    </div>
+
+    <!-- ── Financial Goals ── -->
+    <span class="settings-section-title">মাসিক টার্গেট</span>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">মাসিক Income Goal (BDT)</label>
+        <input type="number" class="form-input" id="setIncomeGoal" placeholder="150000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">মাসিক Expense Budget (BDT)</label>
+        <input type="number" class="form-input" id="setExpenseBudget" placeholder="60000">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Savings Goal (% of Income)</label>
+      <input type="number" class="form-input" id="setSavingsGoalPct" placeholder="30" min="0" max="100">
+    </div>
+    <div class="form-group">
+      <label class="form-label">USD → BDT Exchange Rate</label>
+      <input type="number" class="form-input" id="setUsdRate" placeholder="110" step="0.01">
+    </div>
+
+    <!-- ── Budget Management (per category) ── -->
+    <span class="settings-section-title">ক্যাটাগরি-ভিত্তিক বাজেট লিমিট</span>
+    <div id="budgetListContainer">
+      <div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">কোনো বাজেট লিমিট সেট করা নেই</div></div>
+    </div>
+    <button class="btn-add-row" id="btnAddBudget">+ নতুন ক্যাটাগরির বাজেট যুক্ত করো</button>
+
+    <!-- ── News Interests ── -->
+    <span class="settings-section-title">News Interest (Part 3)</span>
+    <div class="form-group">
+      <label class="form-label">Interest ১</label>
+      <div class="select-wrapper">
+        <select class="form-select" id="setInterest1">
+          <option value="technology">Technology</option>
+          <option value="business">Business</option>
+          <option value="health">Health</option>
+          <option value="sports">Sports</option>
+          <option value="science">Science</option>
+          <option value="finance">Finance</option>
+          <option value="politics">Politics</option>
+          <option value="startups">Startups</option>
+        </select>
+        <span class="select-arrow"></span>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">Interest ২</label>
+        <div class="select-wrapper">
+          <select class="form-select" id="setInterest2">
+            <option value="technology">Technology</option>
+            <option value="business">Business</option>
+            <option value="health">Health</option>
+            <option value="sports">Sports</option>
+            <option value="science">Science</option>
+            <option value="finance">Finance</option>
+            <option value="politics">Politics</option>
+            <option value="startups">Startups</option>
+          </select>
+          <span class="select-arrow"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interest ৩</label>
+        <div class="select-wrapper">
+          <select class="form-select" id="setInterest3">
+            <option value="technology">Technology</option>
+            <option value="business">Business</option>
+            <option value="health">Health</option>
+            <option value="sports">Sports</option>
+            <option value="science">Science</option>
+            <option value="finance">Finance</option>
+            <option value="politics">Politics</option>
+            <option value="startups">Startups</option>
+          </select>
+          <span class="select-arrow"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WhatsApp Notification (Part 4) ── -->
+    <span class="settings-section-title">WhatsApp Notification (Make.com)</span>
+    <div class="settings-row">
+      <label class="form-label" style="margin-bottom:0;">নতুন Client/Lead-এ WhatsApp Alert</label>
+      <label class="toggle-switch">
+        <input type="checkbox" id="setWhatsappEnabled">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <label class="form-label">Make.com Webhook URL</label>
+      <input type="text" class="form-input" id="setMakeWebhookUrl" placeholder="https://hook.us1.make.com/...">
+    </div>
+
+    <button class="btn-submit" id="btnSaveSettings" style="margin-top:24px;">
+      <span class="btn-text">✓ সব পরিবর্তন সংরক্ষণ করো</span>
+      <span class="btn-spinner"><span class="spinner-circle"></span></span>
+    </button>
+
+    <p class="app-footer-note" style="margin-top:20px;">
+      এই Settings পরিবর্তন সরাসরি SETTINGS sheet-এ সংরক্ষিত হয়। Google Sheet
+      খোলার প্রয়োজন নেই — সবকিছু এখান থেকেই।
+    </p>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BUDGET ADD/EDIT MODAL (Part 5) ── ── -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="modal-overlay" id="budgetModal">
+  <div class="modal-box" style="max-width: 380px;">
+    <div class="modal-header">
+      <span class="modal-title" id="budgetModalTitle">নতুন বাজেট যুক্ত করো</span>
+      <button class="modal-close" id="budgetModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="budgetForm">
+        <input type="hidden" id="budgetEditingCategory" value="">
+        <div class="form-group">
+          <label class="form-label">ক্যাটাগরি<span class="required-star">*</span></label>
+          <input type="text" class="form-input" id="budgetCategory" required placeholder="যেমন: Office Rent">
+        </div>
+        <div class="form-group">
+          <label class="form-label">মাসিক বাজেট লিমিট (BDT)<span class="required-star">*</span></label>
+          <input type="number" class="form-input" id="budgetLimit" required placeholder="25000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">নোট (Optional)</label>
+          <input type="text" class="form-input" id="budgetNote" placeholder="যেমন: Monthly office rent">
+        </div>
+        <button type="submit" class="btn-submit"><span class="btn-text">✓ সংরক্ষণ করো</span><span class="btn-spinner"><span class="spinner-circle"></span></span></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ENTRY EDIT MODAL (Part 5) ── এন্ট্রি History-তে Edit করার জন্য -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div class="modal-overlay" id="entryEditModal">
+  <div class="modal-box" style="max-width: 420px;">
+    <div class="modal-header">
+      <span class="modal-title">এন্ট্রি এডিট করো</span>
+      <button class="modal-close" id="entryEditModalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="entryEditForm">
+        <input type="hidden" id="editRowId" value="">
+        <div class="form-group">
+          <label class="form-label">পরিমাণ<span class="required-star">*</span></label>
+          <div class="form-row-currency">
+            <div class="amount-wrapper">
+              <span class="amount-prefix" id="editCurrencyPrefix">৳</span>
+              <input type="number" class="form-input amount-input" id="editAmount" required min="1" step="0.01">
+            </div>
+            <div class="select-wrapper">
+              <select class="form-select" id="editCurrency">
+                <option value="BDT">BDT (৳)</option>
+                <option value="USD">USD ($)</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ক্যাটাগরি<span class="required-star">*</span></label>
+          <div class="select-wrapper">
+            <select class="form-select" id="editCategory" required></select>
+            <span class="select-arrow"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">তারিখ<span class="required-star">*</span></label>
+          <input type="date" class="form-input" id="editDate" required>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <div class="select-wrapper">
+              <select class="form-select" id="editPayment">
+                <option value="Cash">Cash</option>
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Rocket">Rocket</option>
+                <option value="Bank">Bank</option>
+                <option value="Card">Card</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Member</label>
+            <div class="select-wrapper">
+              <select class="form-select" id="editMember">
+                <option value="AUMATIQ Admin">AUMATIQ Admin</option>
+                <option value="Faisal BK">Faisal BK</option>
+                <option value="Tanzina BK">Tanzina BK</option>
+                <option value="Team Member 1">Team Member 1</option>
+                <option value="Team Member 2">Team Member 2</option>
+                <option value="Team Member 3">Team Member 3</option>
+              </select>
+              <span class="select-arrow"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">নোট</label>
+          <textarea class="form-textarea" id="editNote" placeholder="বিবরণ..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit"><span class="btn-text">✓ পরিবর্তন সংরক্ষণ করো</span><span class="btn-spinner"><span class="spinner-circle"></span></span></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
 <!-- JAVASCRIPT                                                   -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 
@@ -1603,7 +1958,7 @@ body {
 
 // ⚠️⚠️⚠️ এখানে তোমার Part 1-এর Web App URL বসাও ⚠️⚠️⚠️
 // Apps Script → Deploy → Web app → URL কপি করো
-var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec";
+var WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
 
 // ════════════════════════════════════════════════════════════
 // STATE — সব app-wide data এখানে রাখা হয়
@@ -1640,6 +1995,8 @@ var STATE = {
 
   reportMonthOffset: 0, // 0 = current month, -1 = last month etc.
   monthlyReportHistory: [], // Part 4 — get_monthly_report থেকে cached, পুরনো → নতুন ক্রমে
+  budgetList: [], // Part 5 — Settings panel-এর বাজেট সেকশনে cached
+  entryHistory: [], // Part 5 — এন্ট্রি tab-এর History view-এ cached
   editingCrmType: null, // 'client' | 'pipeline' | 'project' — for FAB context
   newsLoadedOnce: false  // News tab-এ একবারের বেশি auto-fetch না করার জন্য (Part 3)
 };
@@ -1695,16 +2052,19 @@ function formatBDT(amount) {
   return '৳' + Math.round(n).toLocaleString('en-US');
 }
 
-function loadCategoriesFromStorage() {
-  try {
-    var saved = localStorage.getItem('aumatiq_categories');
-    if (saved) STATE.categories = JSON.parse(saved);
-  } catch (e) { console.warn('Category load failed, using defaults', e); }
-}
-
-function saveCategoriesToStorage() {
-  try { localStorage.setItem('aumatiq_categories', JSON.stringify(STATE.categories)); }
-  catch (e) { console.warn('Category save failed', e); }
+/**
+ * Part 5 — Categories এখন SETTINGS sheet-এ JSON হিসেবে থাকে, localStorage-এ না।
+ * এর সুবিধা: একটা ফোনে category add করলে অন্য ফোনে app install করলেও সেটা
+ * দেখা যাবে, এবং browser data clear হলেও category হারাবে না।
+ */
+function loadCategoriesFromBackend(onDone) {
+  fetchFromBackend('action=get_categories', function (data) {
+    STATE.categories = data; // { expense: [...], income: [...], savings: [...] }
+    if (onDone) onDone();
+  }, function () {
+    // Network fail হলে app পুরোপুরি অচল না হয়ে, সাময়িকভাবে hardcoded fallback ব্যবহার করবে
+    if (onDone) onDone();
+  });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1758,7 +2118,7 @@ window.addEventListener('offline', updateOfflineBanner);
 // ════════════════════════════════════════════════════════════
 
 function callBackend(payload, onSuccess, onError) {
-  if (WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec") {
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
     showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
     if (onError) onError();
     return;
@@ -2005,6 +2365,10 @@ document.getElementById('reviewConfirmBtn').addEventListener('click', function (
       closeReviewScreen();
       showToast('success', 'এন্ট্রি সফল!', data.message || 'সংরক্ষিত হয়েছে।');
       resetEntryForm();
+      // History panel খোলা থাকলে নতুন entry-সহ refresh করো
+      if (document.getElementById('entryHistorySection').style.display !== 'none') {
+        loadEntryHistory();
+      }
       btn.disabled = false;
       btn.textContent = '✓ নিশ্চিত করুন';
     },
@@ -2049,10 +2413,17 @@ function renderCategoryListModal(categoryKey) {
   container.querySelectorAll('.cat-delete-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var idx = parseInt(btn.dataset.idx, 10);
-      STATE.categories[categoryKey].splice(idx, 1);
-      saveCategoriesToStorage();
-      renderCategoryListModal(categoryKey);
-      populateCategoryDropdown(categoryKey);
+      var catName = STATE.categories[categoryKey][idx];
+      btn.disabled = true;
+      callBackend({ action: 'category_delete', categoryType: categoryKey, categoryName: catName },
+        function (data) {
+          STATE.categories[categoryKey] = data.categories;
+          renderCategoryListModal(categoryKey);
+          populateCategoryDropdown(categoryKey);
+          showToast('success', 'ক্যাটাগরি মুছে ফেলা হয়েছে', catName);
+        },
+        function () { btn.disabled = false; }
+      );
     });
   });
 }
@@ -2071,11 +2442,19 @@ document.getElementById('addCategoryBtn').addEventListener('click', function () 
     showToast('warning', 'ইতিমধ্যে আছে', 'এই ক্যাটাগরি আগেই যুক্ত করা আছে।');
     return;
   }
-  STATE.categories[cfg.key].push(val);
-  saveCategoriesToStorage();
-  renderCategoryListModal(cfg.key);
-  populateCategoryDropdown(cfg.key);
-  input.value = '';
+  var btn = this;
+  btn.disabled = true;
+  callBackend({ action: 'category_add', categoryType: cfg.key, categoryName: val },
+    function (data) {
+      STATE.categories[cfg.key] = data.categories;
+      renderCategoryListModal(cfg.key);
+      populateCategoryDropdown(cfg.key);
+      input.value = '';
+      showToast('success', 'ক্যাটাগরি যুক্ত হয়েছে', val);
+      btn.disabled = false;
+    },
+    function () { btn.disabled = false; }
+  );
 });
 
 // ════════════════════════════════════════════════════════════
@@ -2085,13 +2464,9 @@ document.getElementById('addCategoryBtn').addEventListener('click', function () 
 // নোট: Part 1-এর Code.gs ইতিমধ্যে Dashboard tab-এ পুরো summary লিখে রাখে
 // (refreshDashboard ফাংশন)। এই PWA-তে আমরা সরাসরি Sheets API দিয়ে Dashboard
 // tab পড়তে পারি না (Apps Script Web App শুধু doPost/doGet handle করে),
-// তাই Dashboard ভিউ এখানে client-side cached entry/CRM data থেকে নিজে
-// calculate করে দেখানো হয় — Google Sheet-এর Dashboard tab-ও সমান্তরালে
-// একই হিসাব রাখে (backend থেকে), দুটো জায়গায় same numbers থাকবে।
-//
-// বাস্তব ব্যবহারে: তুমি যখনই entry/CRM data সংরক্ষণ করবে, doPost() নিজে
-// refreshDashboard() trigger করে — তাই Google Sheet-এর Dashboard tab সবসময়
-// up-to-date থাকে, এই PWA view টা সেই হিসাবের mobile-friendly প্রতিচ্ছবি মাত্র।
+// তাই Dashboard ভিউ এখন সরাসরি doGet(?action=get_dashboard) থেকে real
+// সংখ্যা fetch করে দেখায় — Code.gs-এর computeMonthlySummary() ব্যবহার করেই
+// এই সংখ্যা আসে, তাই Google Sheet-এর Dashboard tab আর এই view সবসময় মিলবে।
 
 var monthLabelsBn = ["", "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
   "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
@@ -2102,20 +2477,84 @@ function getMonthKeyWithOffset(offset) {
   return { year: d.getFullYear(), month: d.getMonth() + 1, key: d.getFullYear() + '-' + pad2(d.getMonth() + 1) };
 }
 
+/** GET-only helper — callBackend() শুধু POST করে, Dashboard/Settings/Budget/Entry-list সব GET দিয়ে আসে */
+function fetchFromBackend(queryString, onSuccess, onError) {
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
+    showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি।');
+    if (onError) onError();
+    return;
+  }
+  // ⚠️ redirect:'follow' আবশ্যক — Apps Script doGet() response সবসময়
+  // script.google.com → script.googleusercontent.com redirect হয়ে আসে।
+  // এটা ছাড়া GET request silently fail করতে পারে (callBackend()-এর POST
+  // call-এ এই same redirect handling আগে থেকেই ছিল, কিন্তু GET helper
+  // তৈরি করার সময় এটা ভুলে বাদ পড়ে গিয়েছিল — Part 5-এর প্রকৃত bug)।
+  fetch(WEB_APP_URL + '?' + queryString, { method: 'GET', redirect: 'follow' })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success) { if (onSuccess) onSuccess(data.data); }
+      else { showToast('error', 'ডেটা লোড করা যায়নি', data.error || 'অজানা সমস্যা'); if (onError) onError(data); }
+    })
+    .catch(function (err) {
+      showToast('error', 'নেটওয়ার্ক সমস্যা', 'ইন্টারনেট চেক করো।');
+      if (onError) onError(err);
+    });
+}
+
 function renderDashboard() {
-  var mk = getMonthKeyWithOffset(0);
-  document.getElementById('dashboardMonthLabel').textContent = monthLabelsBn[mk.month] + ' ' + mk.year;
+  fetchFromBackend('action=get_dashboard', function (d) {
+    STATE.lastDashboardData = d;
 
-  // Demo/placeholder note: প্রকৃত entry data Part 1 backend-এ Google Sheets-এ আছে।
-  // এই PWA নিজে cached client-side summary দেখায় যদি কোনো entry এই session-এ করা হয়।
-  // প্রথমবার app খুললে সব শূন্য দেখাবে যতক্ষণ না entry দেওয়া হয় — এটাই প্রত্যাশিত।
+    document.getElementById('dashboardMonthLabel').textContent = d.monthLabel;
 
-  showToast('info', 'Dashboard', 'লাইভ ডেটার জন্য Google Sheet-এর "Dashboard" ট্যাব দেখো — সেখানে backend থেকে স্বয়ংক্রিয়ভাবে আপডেট হয়।');
+    var net = d.netBalance;
+    var banner = document.getElementById('netBalanceBanner');
+    banner.classList.remove('positive', 'negative');
+    banner.classList.add(net >= 0 ? 'positive' : 'negative');
+    document.getElementById('netBalanceValue').textContent = formatBDT(net);
+
+    document.getElementById('statTotalIncome').textContent = formatBDT(d.totalIncomeBDT);
+    document.getElementById('incomeGoalBar').style.width = Math.min(d.incomeGoalPct, 100) + '%';
+    document.getElementById('incomeGoalText').textContent = 'Goal-এর ' + d.incomeGoalPct + '% অর্জিত';
+
+    document.getElementById('statTotalExpense').textContent = formatBDT(d.totalExpenseBDT);
+    document.getElementById('expenseBudgetBar').style.width = Math.min(d.expenseBudgetPct, 100) + '%';
+    document.getElementById('expenseBudgetBar').className = 'progress-fill ' + (d.expenseBudgetPct > 100 ? 'danger' : 'indigo');
+    document.getElementById('expenseBudgetText').textContent = 'বাজেটের ' + d.expenseBudgetPct + '% ব্যবহৃত';
+
+    document.getElementById('statTotalSavings').textContent = formatBDT(d.totalSavingsBDT);
+    document.getElementById('savingsRateText').textContent = 'Savings Rate: ' + d.savingsRatePct + '%';
+
+    renderCategoryBreakdown('expenseCategoryBreakdown', d.expenseByCategory, 'এই মাসে কোনো খরচের এন্ট্রি নেই');
+    renderCategoryBreakdown('incomeCategoryBreakdown', d.incomeByCategory, 'এই মাসে কোনো আয়ের এন্ট্রি নেই');
+
+    document.getElementById('dashActiveClients').textContent = d.crm.activeClients;
+    document.getElementById('dashMRR').textContent = formatBDT(d.crm.mrrBDT);
+    document.getElementById('dashOpenLeads').textContent = d.crm.openLeads;
+    document.getElementById('dashPipelineValue').textContent = formatBDT(d.crm.pipelineValueBDT);
+    document.getElementById('dashAtRisk').textContent = d.crm.atRiskClients;
+  });
+}
+
+function renderCategoryBreakdown(containerId, categoryObj, emptyText) {
+  var container = document.getElementById(containerId);
+  var keys = Object.keys(categoryObj || {});
+  if (keys.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">' + emptyText + '</div></div>';
+    return;
+  }
+  keys.sort(function (a, b) { return categoryObj[b] - categoryObj[a]; });
+  var html = '';
+  keys.forEach(function (cat) {
+    html += '<div class="cat-breakdown-row"><span class="cat-breakdown-name">' + cat + '</span>' +
+      '<span class="cat-breakdown-amount">' + formatBDT(categoryObj[cat]) + '</span></div>';
+  });
+  container.innerHTML = html;
 }
 
 document.getElementById('refreshDashboardBtn').addEventListener('click', function () {
-  showToast('info', 'রিফ্রেশ হচ্ছে', 'Google Sheet-এর Dashboard ট্যাব প্রতিটি নতুন এন্ট্রির পর নিজেই আপডেট হয়।');
   renderDashboard();
+  showToast('success', 'রিফ্রেশ হয়েছে', 'Dashboard-এর সর্বশেষ ডেটা লোড হয়েছে।');
 });
 
 // ════════════════════════════════════════════════════════════
@@ -2132,10 +2571,61 @@ document.querySelectorAll('.crm-subtab-btn').forEach(function (btn) {
   });
 });
 
+/**
+ * Part 5 — get_crm_list থেকে আসা raw Sheet headers (যেমন "Client Name",
+ * "Health Score") কে frontend-এর প্রত্যাশিত camelCase keys (name, healthScore)
+ * এ ম্যাপ করে। এই mapping ছাড়া renderClientsList()/openEditClientModal()
+ * ইত্যাদি কাজ করবে না, কারণ ওরা সবসময় camelCase key পড়ে।
+ */
+function mapClientFromSheet(raw) {
+  return {
+    id: raw["Client ID"], name: raw["Client Name"], businessType: raw["Business Type"],
+    country: raw["Country"], service: raw["Service"], status: raw["Status"],
+    setupFee: raw["Setup Fee"], currency: raw["Currency"], retainer: raw["Monthly Retainer"],
+    startDate: raw["Start Date"], nextPaymentDue: raw["Next Payment Due"],
+    contactName: raw["Contact Name"], contactEmail: raw["Contact Email"],
+    whatsapp: raw["WhatsApp"], notes: raw["Notes"], healthScore: raw["Health Score"]
+  };
+}
+function mapPipelineFromSheet(raw) {
+  return {
+    id: raw["Lead ID"], company: raw["Company Name"], contactPerson: raw["Contact Person"],
+    email: raw["Email"], phone: raw["WhatsApp/Phone"], country: raw["Country"],
+    serviceInterest: raw["Service Interest"], leadSource: raw["Lead Source"], stage: raw["Stage"],
+    estimatedValue: raw["Estimated Value (USD)"], firstContactDate: raw["First Contact Date"],
+    lastFollowUp: raw["Last Follow-up"], nextAction: raw["Next Action"],
+    nextActionDate: raw["Next Action Date"], probability: raw["Probability %"], notes: raw["Notes"]
+  };
+}
+function mapProjectFromSheet(raw) {
+  return {
+    id: raw["Project ID"], clientId: raw["Client ID"], name: raw["Project Name"],
+    serviceType: raw["Service Type"], status: raw["Status"], startDate: raw["Start Date"],
+    deadline: raw["Deadline"], completionPct: raw["Completion %"], phase: raw["Phase"],
+    deliverables: raw["Deliverables"], blockers: raw["Blockers"], notes: raw["Notes"]
+  };
+}
+
+/**
+ * Backend থেকে CLIENTS/PIPELINE/PROJECTS — তিনটাই fresh নিয়ে STATE আপডেট করে।
+ * App খোলার সময় এবং CRM ট্যাবে ঢোকার সময় কল হয়, যাতে app বন্ধ করে আবার
+ * খুললেও আগের সব client/lead/project দেখা যায় (session cache-only সমস্যা ঠিক হলো)।
+ */
+function loadCrmFromBackend(onDone) {
+  fetchFromBackend('action=get_crm_list', function (data) {
+    STATE.clients = (data.clients || []).map(mapClientFromSheet);
+    STATE.pipeline = (data.pipeline || []).map(mapPipelineFromSheet);
+    STATE.projects = (data.projects || []).map(mapProjectFromSheet);
+    if (onDone) onDone();
+  });
+}
+
 function renderCrmList() {
-  renderClientsList();
-  renderPipelineList();
-  renderProjectsList();
+  loadCrmFromBackend(function () {
+    renderClientsList();
+    renderPipelineList();
+    renderProjectsList();
+  });
 }
 
 function renderClientsList() {
@@ -2508,7 +2998,7 @@ var pendingDelete = null; // { type: 'client'|'pipeline'|'project', id, name }
 
 function openConfirmDelete(type, id, name) {
   pendingDelete = { type: type, id: id, name: name };
-  var labelMap = { client: 'Client', pipeline: 'Lead', project: 'Project' };
+  var labelMap = { client: 'Client', pipeline: 'Lead', project: 'Project', budget: 'বাজেট', entry: 'এন্ট্রি' };
   document.getElementById('confirmDeleteTitle').textContent = labelMap[type] + ' মুছে ফেলবে?';
   document.getElementById('confirmDeleteMessage').innerHTML =
     '<strong>' + name + '</strong>'+'-কে স্থায়ীভাবে মুছে ফেলা হবে। এই কাজটি ফিরিয়ে আনা যাবে না।';
@@ -2526,8 +3016,14 @@ document.getElementById('confirmDeleteConfirmBtn').addEventListener('click', fun
   btn.disabled = true;
   btn.textContent = 'মুছে ফেলা হচ্ছে...';
 
-  var actionMap = { client: 'client_delete', pipeline: 'pipeline_delete', project: 'project_delete' };
-  var idFieldMap = { client: 'clientId', pipeline: 'leadId', project: 'projectId' };
+  var actionMap = {
+    client: 'client_delete', pipeline: 'pipeline_delete', project: 'project_delete',
+    budget: 'budget_delete', entry: 'entry_delete'
+  };
+  var idFieldMap = {
+    client: 'clientId', pipeline: 'leadId', project: 'projectId',
+    budget: 'category', entry: 'rowId'
+  };
 
   var payload = { action: actionMap[pendingDelete.type] };
   payload[idFieldMap[pendingDelete.type]] = pendingDelete.id;
@@ -2539,9 +3035,16 @@ document.getElementById('confirmDeleteConfirmBtn').addEventListener('click', fun
     } else if (pendingDelete.type === 'pipeline') {
       STATE.pipeline = STATE.pipeline.filter(function (p) { return p.id !== pendingDelete.id; });
       renderPipelineList();
-    } else {
+    } else if (pendingDelete.type === 'project') {
       STATE.projects = STATE.projects.filter(function (p) { return p.id !== pendingDelete.id; });
       renderProjectsList();
+    } else if (pendingDelete.type === 'budget') {
+      STATE.budgetList = (STATE.budgetList || []).filter(function (b) { return b.category !== pendingDelete.id; });
+      renderBudgetListInPanel();
+    } else if (pendingDelete.type === 'entry') {
+      STATE.entryHistory = (STATE.entryHistory || []).filter(function (e) { return e["Row ID"] !== pendingDelete.id; });
+      renderEntryHistory();
+      renderDashboard();
     }
     showToast('success', 'মুছে ফেলা হয়েছে', pendingDelete.name);
     document.getElementById('confirmDeleteModal').classList.remove('show');
@@ -2569,32 +3072,14 @@ document.getElementById('reportNextMonth').addEventListener('click', function ()
   }
 });
 
-/**
- * doGet(?action=get_monthly_report) থেকে fetch করে।
- * fetch() এখানে GET ব্যবহার করে (callBackend() শুধু POST করে, তাই আলাদা helper)।
- */
-function fetchMonthlyReport(onSuccess) {
-  if (WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec") {
-    showToast('error', 'Setup অসম্পূর্ণ', 'WEB_APP_URL এখনো বসানো হয়নি।');
-    return;
-  }
-  fetch(WEB_APP_URL + '?action=get_monthly_report&months=6')
-    .then(function (res) { return res.json(); })
-    .then(function (data) {
-      if (data.success) {
-        STATE.monthlyReportHistory = data.data; // [{monthKey, monthLabel, income, expense, savings, net}, ...] পুরনো → নতুন ক্রমে
-        onSuccess();
-      } else {
-        showToast('error', 'রিপোর্ট লোড করা যায়নি', data.error || 'অজানা সমস্যা');
-      }
-    })
-    .catch(function () {
-      showToast('error', 'নেটওয়ার্ক সমস্যা', 'রিপোর্ট ডেটা আনা যায়নি, ইন্টারনেট চেক করো।');
-    });
-}
-
 function renderReports() {
-  fetchMonthlyReport(renderReportsFromCache);
+  // Part 5 — আগে এখানে একটা আলাদা one-off fetch() function ছিল (fetchMonthlyReport),
+  // যেটা redirect:'follow' সেট করতো না — এখন shared fetchFromBackend() ব্যবহার
+  // করা হচ্ছে, যাতে একই bug দুই জায়গায় আলাদাভাবে fix করতে না হয়।
+  fetchFromBackend('action=get_monthly_report&months=6', function (data) {
+    STATE.monthlyReportHistory = data; // পুরনো → নতুন ক্রমে
+    renderReportsFromCache();
+  });
 }
 
 function renderReportsFromCache() {
@@ -2654,18 +3139,316 @@ function renderReportsFromCache() {
 }
 
 // ════════════════════════════════════════════════════════════
+// SETTINGS PANEL (Part 5) — নাম/email/goals/USD rate/WhatsApp toggle/news
+// interest — সবকিছু এখান থেকেই দেখা ও বদলানো যায়, Google Sheet-এ যাওয়া লাগে না
+// ════════════════════════════════════════════════════════════
+
+document.getElementById('openSettingsBtn').addEventListener('click', openSettingsPanel);
+document.getElementById('closeSettingsBtn').addEventListener('click', closeSettingsPanel);
+
+function openSettingsPanel() {
+  document.getElementById('settingsPanel').classList.add('show');
+  loadSettingsIntoPanel();
+  loadBudgetIntoPanel();
+}
+
+function closeSettingsPanel() {
+  document.getElementById('settingsPanel').classList.remove('show');
+}
+
+function loadSettingsIntoPanel() {
+  fetchFromBackend('action=get_settings', function (s) {
+    document.getElementById('setYourName').value = s.YOUR_NAME || '';
+    document.getElementById('setYourEmail').value = s.YOUR_EMAIL || '';
+    document.getElementById('setIncomeGoal').value = s.MONTHLY_INCOME_GOAL || '';
+    document.getElementById('setExpenseBudget').value = s.MONTHLY_EXPENSE_BUDGET || '';
+    document.getElementById('setSavingsGoalPct').value = s.SAVINGS_GOAL_PCT || '';
+    document.getElementById('setUsdRate').value = s.USD_TO_BDT_RATE || '';
+    document.getElementById('setInterest1').value = s.INTEREST_1 || 'technology';
+    document.getElementById('setInterest2').value = s.INTEREST_2 || 'business';
+    document.getElementById('setInterest3').value = s.INTEREST_3 || 'health';
+    document.getElementById('setWhatsappEnabled').checked = String(s.WHATSAPP_NOTIFY_ENABLED).toUpperCase() === 'TRUE';
+    var webhookVal = s.MAKE_WEBHOOK_URL || '';
+    document.getElementById('setMakeWebhookUrl').value = (webhookVal.indexOf('PASTE_YOUR') === 0) ? '' : webhookVal;
+  });
+}
+
+document.getElementById('btnSaveSettings').addEventListener('click', function () {
+  var btn = this;
+  btn.disabled = true; btn.classList.add('loading');
+
+  var payload = {
+    action: 'update_settings',
+    YOUR_NAME: document.getElementById('setYourName').value,
+    YOUR_EMAIL: document.getElementById('setYourEmail').value,
+    MONTHLY_INCOME_GOAL: document.getElementById('setIncomeGoal').value,
+    MONTHLY_EXPENSE_BUDGET: document.getElementById('setExpenseBudget').value,
+    SAVINGS_GOAL_PCT: document.getElementById('setSavingsGoalPct').value,
+    USD_TO_BDT_RATE: document.getElementById('setUsdRate').value,
+    INTEREST_1: document.getElementById('setInterest1').value,
+    INTEREST_2: document.getElementById('setInterest2').value,
+    INTEREST_3: document.getElementById('setInterest3').value,
+    WHATSAPP_NOTIFY_ENABLED: document.getElementById('setWhatsappEnabled').checked ? 'TRUE' : 'FALSE',
+    MAKE_WEBHOOK_URL: document.getElementById('setMakeWebhookUrl').value || 'PASTE_YOUR_MAKE_WEBHOOK_URL_HERE'
+  };
+
+  callBackend(payload, function () {
+    showToast('success', 'সংরক্ষিত হয়েছে', 'সব Settings আপডেট হয়েছে।');
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+// ── Budget Management (inside Settings panel) ──
+
+function loadBudgetIntoPanel() {
+  fetchFromBackend('action=get_budget_list', function (list) {
+    STATE.budgetList = list;
+    renderBudgetListInPanel();
+  });
+}
+
+function renderBudgetListInPanel() {
+  var container = document.getElementById('budgetListContainer');
+  if (!STATE.budgetList || STATE.budgetList.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">কোনো বাজেট লিমিট সেট করা নেই</div></div>';
+    return;
+  }
+  var html = '';
+  STATE.budgetList.forEach(function (b) {
+    html += '<div class="budget-list-item">' +
+      '<div class="budget-list-top"><span class="budget-list-cat">' + b.category + '</span>' +
+      '<span class="budget-list-amount">' + formatBDT(b.monthlyLimit) + '/mo</span></div>' +
+      (b.note ? '<div class="entry-history-meta">' + b.note + '</div>' : '') +
+      '<div class="budget-list-actions">' +
+      '<button class="crm-action-btn" data-edit-budget="' + b.category + '">✏️ Edit</button>' +
+      '<button class="crm-action-btn danger" data-delete-budget="' + b.category + '">🗑️ Delete</button>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-edit-budget]').forEach(function (btn) {
+    btn.addEventListener('click', function () { openBudgetModal(btn.dataset.editBudget); });
+  });
+  container.querySelectorAll('[data-delete-budget]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openConfirmDelete('budget', btn.dataset.deleteBudget, btn.dataset.deleteBudget);
+    });
+  });
+}
+
+document.getElementById('btnAddBudget').addEventListener('click', function () { openBudgetModal(null); });
+document.getElementById('budgetModalClose').addEventListener('click', function () {
+  document.getElementById('budgetModal').classList.remove('show');
+});
+
+function openBudgetModal(categoryToEdit) {
+  document.getElementById('budgetForm').reset();
+  document.getElementById('budgetEditingCategory').value = '';
+
+  if (categoryToEdit) {
+    var b = STATE.budgetList.find(function (x) { return x.category === categoryToEdit; });
+    if (!b) { showToast('error', 'পাওয়া যায়নি', 'বাজেট data লোড করা যায়নি।'); return; }
+    document.getElementById('budgetModalTitle').textContent = 'বাজেট এডিট করো';
+    document.getElementById('budgetEditingCategory').value = b.category;
+    document.getElementById('budgetCategory').value = b.category;
+    document.getElementById('budgetCategory').disabled = true; // edit-এ category name বদলানো যাবে না (delete+add করতে হবে)
+    document.getElementById('budgetLimit').value = b.monthlyLimit;
+    document.getElementById('budgetNote').value = b.note || '';
+  } else {
+    document.getElementById('budgetModalTitle').textContent = 'নতুন বাজেট যুক্ত করো';
+    document.getElementById('budgetCategory').disabled = false;
+  }
+  document.getElementById('budgetModal').classList.add('show');
+}
+
+document.getElementById('budgetForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var editingCategory = document.getElementById('budgetEditingCategory').value;
+  var isEdit = !!editingCategory;
+
+  var payload = {
+    action: isEdit ? 'budget_update' : 'budget_add',
+    category: isEdit ? editingCategory : document.getElementById('budgetCategory').value,
+    monthlyLimit: parseFloat(document.getElementById('budgetLimit').value) || 0,
+    note: document.getElementById('budgetNote').value
+  };
+
+  callBackend(payload, function () {
+    document.getElementById('budgetModal').classList.remove('show');
+    showToast('success', isEdit ? 'বাজেট আপডেট হয়েছে' : 'বাজেট যুক্ত হয়েছে', payload.category);
+    loadBudgetIntoPanel();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+// ════════════════════════════════════════════════════════════
+// ENTRY HISTORY + EDIT/DELETE (Part 5) — এন্ট্রি ট্যাবে আগের entries দেখা,
+// ভুল entry ঠিক করা, এবং মুছে ফেলা — সবকিছু এই app থেকেই, Sheet-এ না গিয়ে
+// ════════════════════════════════════════════════════════════
+
+function loadEntryHistory() {
+  fetchFromBackend('action=get_entry_list&limit=30', function (list) {
+    STATE.entryHistory = list;
+    renderEntryHistory();
+  });
+}
+
+document.getElementById('historyToggleLink').addEventListener('click', function () {
+  var section = document.getElementById('entryHistorySection');
+  var icon = document.getElementById('historyToggleIcon');
+  var text = document.getElementById('historyToggleText');
+  var isHidden = section.style.display === 'none';
+
+  section.style.display = isHidden ? 'block' : 'none';
+  icon.textContent = isHidden ? '▴' : '▾';
+  text.textContent = isHidden ? 'এন্ট্রি History বন্ধ করো' : 'সাম্প্রতিক এন্ট্রি দেখো';
+
+  if (isHidden && (!STATE.entryHistory || STATE.entryHistory.length === 0)) {
+    loadEntryHistory();
+  }
+});
+
+function renderEntryHistory() {
+  var container = document.getElementById('entryHistoryList');
+  if (!container) return;
+
+  if (!STATE.entryHistory || STATE.entryHistory.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এখনো কোনো এন্ট্রি নেই</div></div>';
+    return;
+  }
+
+  var typeClassMap = { "খরচ": "exp", "আয়": "inc", "সঞ্চয়": "sav" };
+  var html = '';
+  STATE.entryHistory.forEach(function (e) {
+    var rowId = e["Row ID"];
+    var type = e["ধরন"];
+    var amountBDT = e["পরিমাণ (BDT সমান)"];
+    var origCurrency = e["মুদ্রা"];
+    var origAmount = e["পরিমাণ"];
+    var amountLabel = origCurrency === 'USD' ? ('$' + Math.round(origAmount).toLocaleString('en-US') + ' (' + formatBDT(amountBDT) + ')') : formatBDT(amountBDT);
+
+    html += '<div class="entry-history-item">' +
+      '<div class="entry-history-top">' +
+      '<span class="entry-history-cat">' + e["ক্যাটাগরি"] + '</span>' +
+      '<span class="entry-history-amount ' + (typeClassMap[type] || '') + '">' + amountLabel + '</span>' +
+      '</div>' +
+      '<div class="entry-history-meta">' + e["তারিখ"] + ' · ' + e["Payment Method"] + ' · ' + e["Member"] + '</div>' +
+      '<div class="entry-history-actions">' +
+      '<button class="crm-action-btn" data-edit-entry="' + rowId + '">✏️ Edit</button>' +
+      '<button class="crm-action-btn danger" data-delete-entry="' + rowId + '" data-delete-cat="' + e["ক্যাটাগরি"] + '">🗑️ Delete</button>' +
+      '</div></div>';
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('[data-edit-entry]').forEach(function (btn) {
+    btn.addEventListener('click', function () { openEditEntryModal(btn.dataset.editEntry); });
+  });
+  container.querySelectorAll('[data-delete-entry]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openConfirmDelete('entry', btn.dataset.deleteEntry, btn.dataset.deleteCat);
+    });
+  });
+}
+
+function openEditEntryModal(rowId) {
+  var entry = (STATE.entryHistory || []).find(function (e) { return e["Row ID"] === rowId; });
+  if (!entry) { showToast('error', 'পাওয়া যায়নি', 'Entry data লোড করা যায়নি।'); return; }
+
+  var type = entry["ধরন"];
+  var cfg = TYPE_CONFIG[type];
+
+  document.getElementById('editRowId').value = rowId;
+  document.getElementById('editAmount').value = entry["পরিমাণ"];
+  document.getElementById('editCurrency').value = entry["মুদ্রা"];
+  document.getElementById('editCurrencyPrefix').textContent = entry["মুদ্রা"] === 'USD' ? '$' : '৳';
+  document.getElementById('editDate').value = convertDisplayDateToInput(entry["তারিখ"]);
+  document.getElementById('editPayment').value = entry["Payment Method"];
+  document.getElementById('editMember').value = entry["Member"];
+
+  var noteFieldMap = { "খরচ": "খরচের বিবরণ", "আয়": "আয়ের উৎস বিস্তারিত", "সঞ্চয়": "সঞ্চয়ের লক্ষ্য" };
+  document.getElementById('editNote').value = entry[noteFieldMap[type]] || '';
+
+  // ক্যাটাগরি dropdown — এই entry-র type অনুযায়ী populate করো
+  var categorySelect = document.getElementById('editCategory');
+  categorySelect.innerHTML = '';
+  (STATE.categories[cfg.key] || []).forEach(function (cat) {
+    var opt = document.createElement('option');
+    opt.value = cat; opt.textContent = cat;
+    if (cat === entry["ক্যাটাগরি"]) opt.selected = true;
+    categorySelect.appendChild(opt);
+  });
+  // entry-র category যদি বর্তমান list-এ না থাকে (পুরনো/মুছে ফেলা category), তাও দেখাও
+  if ((STATE.categories[cfg.key] || []).indexOf(entry["ক্যাটাগরি"]) === -1) {
+    var extraOpt = document.createElement('option');
+    extraOpt.value = entry["ক্যাটাগরি"]; extraOpt.textContent = entry["ক্যাটাগরি"] + " (পুরনো)";
+    extraOpt.selected = true;
+    categorySelect.appendChild(extraOpt);
+  }
+
+  document.getElementById('entryEditForm').dataset.entryType = type;
+  document.getElementById('entryEditModal').classList.add('show');
+}
+
+document.getElementById('entryEditModalClose').addEventListener('click', function () {
+  document.getElementById('entryEditModal').classList.remove('show');
+});
+
+document.getElementById('editCurrency').addEventListener('change', function () {
+  document.getElementById('editCurrencyPrefix').textContent = this.value === 'USD' ? '$' : '৳';
+});
+
+document.getElementById('entryEditForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var btn = this.querySelector('.btn-submit');
+  btn.disabled = true; btn.classList.add('loading');
+
+  var rowId = document.getElementById('editRowId').value;
+  var type = this.dataset.entryType;
+  var noteFieldMap = { "খরচ": "noteExpense", "আয়": "noteIncome", "সঞ্চয়": "noteSavings" };
+
+  var payload = {
+    action: 'entry_update',
+    rowId: rowId,
+    amount: parseFloat(document.getElementById('editAmount').value),
+    currency: document.getElementById('editCurrency').value,
+    category: document.getElementById('editCategory').value,
+    date: convertInputDateToDisplay(document.getElementById('editDate').value),
+    payment: document.getElementById('editPayment').value,
+    member: document.getElementById('editMember').value
+  };
+  payload[noteFieldMap[type]] = document.getElementById('editNote').value;
+
+  callBackend(payload, function () {
+    document.getElementById('entryEditModal').classList.remove('show');
+    showToast('success', 'এন্ট্রি আপডেট হয়েছে', '');
+    loadEntryHistory();
+    renderDashboard();
+    btn.disabled = false; btn.classList.remove('loading');
+  }, function () { btn.disabled = false; btn.classList.remove('loading'); });
+});
+
+// ════════════════════════════════════════════════════════════
 // APP INIT — সব data load করে App চালু করে
 // ════════════════════════════════════════════════════════════
 
 function initApp() {
-  loadCategoriesFromStorage();
   updateHeaderClock();
   setInterval(updateHeaderClock, 30000);
   updateOfflineBanner();
 
-  // Default type select করে দাও যাতে ফাঁকা state না থাকে
-  selectType('খরচ');
-  populateClientLinkDropdown();
+  // Part 5 — Categories এখন backend (SETTINGS sheet) থেকে আসে, localStorage থেকে না
+  loadCategoriesFromBackend(function () {
+    selectType('খরচ'); // category dropdown populate হওয়ার পরেই default type select করা হয়
+  });
+
+  // Part 5 — CRM data app খোলার সাথেই load হয়, যাতে Entry tab-এর Client Link
+  // dropdown এবং CRM ট্যাব দুটোই আগের সব client/lead/project নিয়ে শুরু করে
+  loadCrmFromBackend(function () {
+    populateClientLinkDropdown();
+  });
 
   switchTab('entry');
 }
@@ -2679,14 +3462,17 @@ function loadNewsBriefing() {
   document.getElementById('newsContentState').style.display = 'none';
   document.getElementById('newsErrorState').style.display = 'none';
 
-  if (WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxnIDGkLVWsEfKxhj1qLl65q-Pnf6bapP-_G3woLRwMaQE8aLquIp9WG8amBCE9m0o/exec") {
+  if (WEB_APP_URL === "YOUR_WEB_APP_URL_HERE") {
     showNewsError('WEB_APP_URL এখনো বসানো হয়নি — index.html-এর top দেখো।');
     return;
   }
 
   var url = WEB_APP_URL + '?action=get_news';
 
-  fetch(url)
+  // ⚠️ redirect:'follow' আবশ্যক — Apps Script doGet() response redirect হয়ে
+  // আসে, এটা ছাড়া fetch silently fail করতে পারে (Part 5 audit-এ পাওয়া bug,
+  // fetchFromBackend()-এও একই ফিক্স করা হয়েছে)।
+  fetch(url, { method: 'GET', redirect: 'follow' })
     .then(function (res) { return res.json(); })
     .then(function (data) {
       if (data.success && data.data) {
