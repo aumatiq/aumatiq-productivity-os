@@ -16,7 +16,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
@@ -54,8 +54,8 @@
   --radius-lg:     16px;
   --radius-xl:     20px;
 
-  --font-display:  'Syne', sans-serif;
-  --font-body:     'Inter', sans-serif;
+  --font-display:  'Syne', 'Noto Sans Bengali', sans-serif;
+  --font-body:     'Inter', 'Noto Sans Bengali', sans-serif;
 
   --color-expense:  #FF6B6B;
   --color-income:   #4CAF50;
@@ -546,7 +546,10 @@ body {
    ============================================================ */
 
 .toast-container {
-  position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 500;
+  /* z-index সবচেয়ে বেশি রাখা হলো — toast সবসময় visible থাকা উচিত, এমনকি
+     Settings panel বা কোনো modal খোলা অবস্থায়ও (যেমন: Settings save করার
+     পর "সংরক্ষিত হয়েছে" toast)। */
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 800;
   display: flex; flex-direction: column; gap: 10px; pointer-events: none;
   width: calc(100% - 32px); max-width: 400px;
 }
@@ -572,7 +575,12 @@ body {
    ============================================================ */
 
 .modal-overlay {
-  position: fixed; inset: 0; z-index: 450; background: rgba(10,10,15,0.8); backdrop-filter: blur(8px);
+  /* ⚠️ বাগ ফিক্স: আগে z-index 450 ছিল, কিন্তু .settings-panel-এর z-index 600 —
+     তাই Settings panel খোলা থাকা অবস্থায় কোনো modal (Budget Add/Edit, Delete
+     confirm) খুললে সেটা Settings-এর নিচে চাপা পড়ে যেতো, অদৃশ্য থাকতো। Settings
+     থেকে Back করার পরেই modal আবার দেখা যেতো (Settings layer সরে যাওয়ায়)।
+     এখন modal-overlay সবসময় সবচেয়ে উপরে থাকবে, যেখান থেকেই খোলা হোক। */
+  position: fixed; inset: 0; z-index: 700; background: rgba(10,10,15,0.8); backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center; padding: 20px;
   opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
 }
@@ -924,17 +932,38 @@ body {
 
 .news-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 14px 16px; margin-bottom: 10px; transition: var(--transition);
+  padding: 12px; margin-bottom: 10px; transition: var(--transition);
+  display: flex; gap: 12px; align-items: flex-start;
 }
 .news-card:hover { border-color: var(--indigo-border); }
-.news-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; margin-bottom: 8px; }
-.news-card-footer { display: flex; align-items: center; justify-content: space-between; }
+
+/* ── 1:1 Thumbnail — fixed square, never distorts, graceful fallback ── */
+.news-card-thumb {
+  width: 64px; height: 64px; flex-shrink: 0; border-radius: var(--radius-sm);
+  background: var(--bg-input); border: 1px solid var(--border);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.news-card-thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.news-card-thumb .news-thumb-fallback {
+  font-size: 22px; opacity: 0.4;
+}
+
+.news-card-body { flex: 1; min-width: 0; }
+.news-card-title {
+  font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; margin-bottom: 8px;
+  font-family: var(--font-body); /* Noto Sans Bengali fallback এখানেই কাজ করে */
+}
+.news-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .news-card-tag {
   font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
   color: var(--indigo-light); background: var(--indigo-dim); border-radius: 10px; padding: 3px 8px;
+  flex-shrink: 0;
 }
 .news-card-link {
   font-size: 12px; font-weight: 600; color: var(--gold); text-decoration: none; transition: var(--transition);
+  flex-shrink: 0;
 }
 .news-card-link:hover { color: var(--gold-light); }
 
@@ -1749,12 +1778,22 @@ body {
       <input type="number" class="form-input" id="setUsdRate" placeholder="110" step="0.01">
     </div>
 
-    <!-- ── Budget Management (per category) ── -->
-    <span class="settings-section-title">ক্যাটাগরি-ভিত্তিক বাজেট লিমিট</span>
-    <div id="budgetListContainer">
-      <div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">কোনো বাজেট লিমিট সেট করা নেই</div></div>
+    <!-- ── Budget Management — Expense (উপরে) ── -->
+    <span class="settings-section-title">💸 খরচের ক্যাটাগরি-ভিত্তিক বাজেট লিমিট</span>
+    <div id="expenseBudgetListContainer">
+      <div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">কোনো খরচের বাজেট লিমিট সেট করা নেই</div></div>
     </div>
-    <button class="btn-add-row" id="btnAddBudget">+ নতুন ক্যাটাগরির বাজেট যুক্ত করো</button>
+    <button class="btn-add-row" id="btnAddExpenseBudget">+ নতুন ক্যাটাগরির খরচ</button>
+
+    <!-- ── Budget Management — Income (নিচে) ── -->
+    <span class="settings-section-title">💰 আয়ের ক্যাটাগরি-ভিত্তিক টার্গেট</span>
+    <div id="incomeBudgetListContainer">
+      <div class="empty-state"><div class="empty-state-icon">🎯</div><div class="empty-state-text">কোনো আয়ের টার্গেট সেট করা নেই</div></div>
+    </div>
+    <button class="btn-add-row" id="btnAddIncomeBudget">+ নতুন ক্যাটাগরির আয়</button>
+    <p class="app-footer-note" style="margin-top:6px; text-align:left;">
+      আয়ের টার্গেট শুধু reference হিসেবে এখানে দেখাবে — কোনো email/alert পাঠাবে না।
+    </p>
 
     <!-- ── News Interests ── -->
     <span class="settings-section-title">News Interest (Part 3)</span>
@@ -1849,12 +1888,13 @@ body {
     <div class="modal-body">
       <form id="budgetForm">
         <input type="hidden" id="budgetEditingCategory" value="">
+        <input type="hidden" id="budgetEditingType" value="Expense">
         <div class="form-group">
           <label class="form-label">ক্যাটাগরি<span class="required-star">*</span></label>
           <input type="text" class="form-input" id="budgetCategory" required placeholder="যেমন: Office Rent">
         </div>
         <div class="form-group">
-          <label class="form-label">মাসিক বাজেট লিমিট (BDT)<span class="required-star">*</span></label>
+          <label class="form-label" id="budgetLimitLabel">মাসিক বাজেট লিমিট (BDT)<span class="required-star">*</span></label>
           <input type="number" class="form-input" id="budgetLimit" required placeholder="25000">
         </div>
         <div class="form-group">
@@ -2994,7 +3034,8 @@ function openEditProjectModal(projectId) {
 // DELETE CONFIRMATION (Part 4) — custom modal, shared by all 3 CRM types
 // ════════════════════════════════════════════════════════════
 
-var pendingDelete = null; // { type: 'client'|'pipeline'|'project', id, name }
+var pendingDelete = null; // { type: 'client'|'pipeline'|'project'|'budget'|'entry', id, name }
+var pendingBudgetDeleteType = 'Expense'; // budget delete-এর সময় Expense/Income আলাদা করার জন্য — openConfirmDelete generic বলে আলাদাভাবে track করা হলো
 
 function openConfirmDelete(type, id, name) {
   pendingDelete = { type: type, id: id, name: name };
@@ -3027,6 +3068,7 @@ document.getElementById('confirmDeleteConfirmBtn').addEventListener('click', fun
 
   var payload = { action: actionMap[pendingDelete.type] };
   payload[idFieldMap[pendingDelete.type]] = pendingDelete.id;
+  if (pendingDelete.type === 'budget') payload.type = pendingBudgetDeleteType; // Expense/Income আলাদা করার জন্য
 
   callBackend(payload, function (data) {
     if (pendingDelete.type === 'client') {
@@ -3039,7 +3081,9 @@ document.getElementById('confirmDeleteConfirmBtn').addEventListener('click', fun
       STATE.projects = STATE.projects.filter(function (p) { return p.id !== pendingDelete.id; });
       renderProjectsList();
     } else if (pendingDelete.type === 'budget') {
-      STATE.budgetList = (STATE.budgetList || []).filter(function (b) { return b.category !== pendingDelete.id; });
+      STATE.budgetList = (STATE.budgetList || []).filter(function (b) {
+        return !(b.category === pendingDelete.id && b.type === pendingBudgetDeleteType);
+      });
       renderBudgetListInPanel();
     } else if (pendingDelete.type === 'entry') {
       STATE.entryHistory = (STATE.entryHistory || []).filter(function (e) { return e["Row ID"] !== pendingDelete.id; });
@@ -3208,54 +3252,73 @@ function loadBudgetIntoPanel() {
 }
 
 function renderBudgetListInPanel() {
-  var container = document.getElementById('budgetListContainer');
-  if (!STATE.budgetList || STATE.budgetList.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">কোনো বাজেট লিমিট সেট করা নেই</div></div>';
+  var list = STATE.budgetList || [];
+  var expenseList = list.filter(function (b) { return b.type !== 'Income'; });
+  var incomeList = list.filter(function (b) { return b.type === 'Income'; });
+
+  renderBudgetSection('expenseBudgetListContainer', expenseList, 'কোনো খরচের বাজেট লিমিট সেট করা নেই', '💰', '/mo');
+  renderBudgetSection('incomeBudgetListContainer', incomeList, 'কোনো আয়ের টার্গেট সেট করা নেই', '🎯', ' টার্গেট/mo');
+}
+
+function renderBudgetSection(containerId, items, emptyText, emptyIcon, suffixLabel) {
+  var container = document.getElementById(containerId);
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">' + emptyIcon + '</div><div class="empty-state-text">' + emptyText + '</div></div>';
     return;
   }
   var html = '';
-  STATE.budgetList.forEach(function (b) {
+  items.forEach(function (b) {
     html += '<div class="budget-list-item">' +
       '<div class="budget-list-top"><span class="budget-list-cat">' + b.category + '</span>' +
-      '<span class="budget-list-amount">' + formatBDT(b.monthlyLimit) + '/mo</span></div>' +
+      '<span class="budget-list-amount">' + formatBDT(b.monthlyLimit) + suffixLabel + '</span></div>' +
       (b.note ? '<div class="entry-history-meta">' + b.note + '</div>' : '') +
       '<div class="budget-list-actions">' +
-      '<button class="crm-action-btn" data-edit-budget="' + b.category + '">✏️ Edit</button>' +
-      '<button class="crm-action-btn danger" data-delete-budget="' + b.category + '">🗑️ Delete</button>' +
+      '<button class="crm-action-btn" data-edit-budget="' + b.category + '" data-edit-type="' + b.type + '">✏️ Edit</button>' +
+      '<button class="crm-action-btn danger" data-delete-budget="' + b.category + '" data-delete-type="' + b.type + '">🗑️ Delete</button>' +
       '</div></div>';
   });
   container.innerHTML = html;
 
   container.querySelectorAll('[data-edit-budget]').forEach(function (btn) {
-    btn.addEventListener('click', function () { openBudgetModal(btn.dataset.editBudget); });
+    btn.addEventListener('click', function () { openBudgetModal(btn.dataset.editBudget, btn.dataset.editType); });
   });
   container.querySelectorAll('[data-delete-budget]').forEach(function (btn) {
     btn.addEventListener('click', function () {
+      pendingBudgetDeleteType = btn.dataset.deleteType; // confirm handler-এ type পাঠানোর জন্য
       openConfirmDelete('budget', btn.dataset.deleteBudget, btn.dataset.deleteBudget);
     });
   });
 }
 
-document.getElementById('btnAddBudget').addEventListener('click', function () { openBudgetModal(null); });
+// দুটো আলাদা বাটন — একটা খরচ-ক্যাটাগরি বাজেট, একটা আয়-ক্যাটাগরি টার্গেট যুক্ত করার জন্য
+document.getElementById('btnAddExpenseBudget').addEventListener('click', function () { openBudgetModal(null, 'Expense'); });
+document.getElementById('btnAddIncomeBudget').addEventListener('click', function () { openBudgetModal(null, 'Income'); });
+
 document.getElementById('budgetModalClose').addEventListener('click', function () {
   document.getElementById('budgetModal').classList.remove('show');
 });
 
-function openBudgetModal(categoryToEdit) {
+function openBudgetModal(categoryToEdit, type) {
   document.getElementById('budgetForm').reset();
   document.getElementById('budgetEditingCategory').value = '';
+  document.getElementById('budgetEditingType').value = type || 'Expense';
+
+  var isIncome = (type === 'Income');
+  document.getElementById('budgetLimitLabel').innerHTML = isIncome
+    ? 'মাসিক আয়ের টার্গেট (BDT)<span class="required-star">*</span>'
+    : 'মাসিক বাজেট লিমিট (BDT)<span class="required-star">*</span>';
 
   if (categoryToEdit) {
-    var b = STATE.budgetList.find(function (x) { return x.category === categoryToEdit; });
-    if (!b) { showToast('error', 'পাওয়া যায়নি', 'বাজেট data লোড করা যায়নি।'); return; }
-    document.getElementById('budgetModalTitle').textContent = 'বাজেট এডিট করো';
+    var b = STATE.budgetList.find(function (x) { return x.category === categoryToEdit && x.type === type; });
+    if (!b) { showToast('error', 'পাওয়া যায়নি', 'ডেটা লোড করা যায়নি।'); return; }
+    document.getElementById('budgetModalTitle').textContent = isIncome ? 'আয়ের টার্গেট এডিট করো' : 'বাজেট এডিট করো';
     document.getElementById('budgetEditingCategory').value = b.category;
     document.getElementById('budgetCategory').value = b.category;
     document.getElementById('budgetCategory').disabled = true; // edit-এ category name বদলানো যাবে না (delete+add করতে হবে)
     document.getElementById('budgetLimit').value = b.monthlyLimit;
     document.getElementById('budgetNote').value = b.note || '';
   } else {
-    document.getElementById('budgetModalTitle').textContent = 'নতুন বাজেট যুক্ত করো';
+    document.getElementById('budgetModalTitle').textContent = isIncome ? 'নতুন আয়ের টার্গেট যুক্ত করো' : 'নতুন বাজেট যুক্ত করো';
     document.getElementById('budgetCategory').disabled = false;
   }
   document.getElementById('budgetModal').classList.add('show');
@@ -3267,18 +3330,20 @@ document.getElementById('budgetForm').addEventListener('submit', function (e) {
   btn.disabled = true; btn.classList.add('loading');
 
   var editingCategory = document.getElementById('budgetEditingCategory').value;
+  var type = document.getElementById('budgetEditingType').value || 'Expense';
   var isEdit = !!editingCategory;
 
   var payload = {
     action: isEdit ? 'budget_update' : 'budget_add',
     category: isEdit ? editingCategory : document.getElementById('budgetCategory').value,
     monthlyLimit: parseFloat(document.getElementById('budgetLimit').value) || 0,
-    note: document.getElementById('budgetNote').value
+    note: document.getElementById('budgetNote').value,
+    type: type
   };
 
   callBackend(payload, function () {
     document.getElementById('budgetModal').classList.remove('show');
-    showToast('success', isEdit ? 'বাজেট আপডেট হয়েছে' : 'বাজেট যুক্ত হয়েছে', payload.category);
+    showToast('success', isEdit ? 'আপডেট হয়েছে' : 'যুক্ত হয়েছে', payload.category);
     loadBudgetIntoPanel();
     btn.disabled = false; btn.classList.remove('loading');
   }, function () { btn.disabled = false; btn.classList.remove('loading'); });
@@ -3518,13 +3583,34 @@ function buildNewsCardsHtml(items, tagField) {
   }
   var html = '';
   items.forEach(function (item) {
-    var tag = tagField && item[tagField] ? '<span class="news-card-tag">' + item[tagField] + '</span>' : '<span></span>';
+    var tag = tagField && item[tagField] ? '<span class="news-card-tag">' + escapeHtml(item[tagField]) + '</span>' : '<span></span>';
+
+    // Part 5 audit fix — 1:1 thumbnail। image না থাকলে বা load fail করলে
+    // (onerror) একটা icon fallback দেখায়, ভাঙা <img> icon কখনো দেখাবে না।
+    var thumbHtml = item.image
+      ? '<img src="' + escapeHtml(item.image) + '" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=&quot;news-thumb-fallback&quot;>📰</span>\';">'
+      : '<span class="news-thumb-fallback">📰</span>';
+
     html += '<div class="news-card">' +
-      '<div class="news-card-title">' + item.title + '</div>' +
+      '<div class="news-card-thumb">' + thumbHtml + '</div>' +
+      '<div class="news-card-body">' +
+      '<div class="news-card-title">' + escapeHtml(item.title) + '</div>' +
       '<div class="news-card-footer">' + tag +
-      '<a href="' + item.link + '" target="_blank" rel="noopener" class="news-card-link">পড়ুন →</a></div></div>';
+      '<a href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener" class="news-card-link">পড়ুন →</a></div>' +
+      '</div></div>';
   });
   return html;
+}
+
+/** RSS থেকে আসা title/link untrusted content — HTML injection ঠেকাতে escape করা হয় */
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 document.getElementById('refreshNewsBtn').addEventListener('click', loadNewsBriefing);
