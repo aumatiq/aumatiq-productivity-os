@@ -794,6 +794,44 @@ body {
 .progress-fill.gold { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
 .progress-fill.danger { background: linear-gradient(90deg, var(--color-expense), #FF8A8A); }
 
+/* ----- Detailed category breakdown (with notes) ----- */
+.detail-entry {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.detail-entry:last-child { border-bottom: none; }
+.detail-entry .entry-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.detail-entry .entry-amount {
+  font-weight: 700;
+  font-family: var(--font-display);
+  white-space: nowrap;
+}
+.detail-entry .entry-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.detail-entry .entry-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.detail-entry .entry-note:empty { display: none; }
+.detail-category-group .category-total {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--gold);
+  padding: 8px 0 4px 0;
+  border-bottom: 1px dashed var(--border);
+  margin-bottom: 6px;
+}
+
 .cat-breakdown-row {
   display: flex; align-items: center; justify-content: space-between; padding: 10px 0;
   border-bottom: 1px solid var(--border); font-size: 13px;
@@ -904,7 +942,7 @@ body {
 .history-figures .hf-net { font-weight: 700; }
 
 /* ============================================================
-   NEWS TAB (placeholder — Part 3 এ active হবে)
+   NEWS TAB (Part 3 — live RSS content)
    ============================================================ */
 
 .news-placeholder {
@@ -923,7 +961,6 @@ body {
   border: 1px solid rgba(245,166,35,0.3); border-radius: 20px; padding: 6px 14px;
 }
 
-/* ── NEWS CARDS (Part 3 — real content) ── */
 .news-section-header {
   display: flex; align-items: center; gap: 8px; margin-bottom: 12px; margin-top: 4px;
 }
@@ -937,7 +974,6 @@ body {
 }
 .news-card:hover { border-color: var(--indigo-border); }
 
-/* ── 1:1 Thumbnail — fixed square, never distorts, graceful fallback ── */
 .news-card-thumb {
   width: 64px; height: 64px; flex-shrink: 0; border-radius: var(--radius-sm);
   background: var(--bg-input); border: 1px solid var(--border);
@@ -953,7 +989,7 @@ body {
 .news-card-body { flex: 1; min-width: 0; }
 .news-card-title {
   font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; margin-bottom: 8px;
-  font-family: var(--font-body); /* Noto Sans Bengali fallback এখানেই কাজ করে */
+  font-family: var(--font-body);
 }
 .news-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .news-card-tag {
@@ -972,7 +1008,6 @@ body {
 }
 .news-refresh-btn-row { text-align: center; margin-top: 8px; }
 
-/* ── Footer note ── */
 .app-footer-note {
   text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 8px; padding: 0 20px; line-height: 1.6;
 }
@@ -1183,17 +1218,25 @@ body {
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header"><span class="card-title">💸 খরচের ক্যাটাগরি</span></div>
+    <!-- Detailed breakdown cards -->
+    <div class="card" id="expenseBreakdownCard">
+      <div class="card-header"><span class="card-title">💸 খরচের বিস্তারিত</span></div>
       <div id="expenseCategoryBreakdown">
         <div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এই মাসে কোনো খরচের এন্ট্রি নেই</div></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header"><span class="card-title">💰 আয়ের ক্যাটাগরি</span></div>
+    <div class="card" id="incomeBreakdownCard">
+      <div class="card-header"><span class="card-title">💰 আয়ের বিস্তারিত</span></div>
       <div id="incomeCategoryBreakdown">
         <div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এই মাসে কোনো আয়ের এন্ট্রি নেই</div></div>
+      </div>
+    </div>
+
+    <div class="card" id="savingsBreakdownCard">
+      <div class="card-header"><span class="card-title">🏦 সঞ্চয়ের বিস্তারিত</span></div>
+      <div id="savingsCategoryBreakdown">
+        <div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">এই মাসে কোনো সঞ্চয়ের এন্ট্রি নেই</div></div>
       </div>
     </div>
 
@@ -2038,7 +2081,9 @@ var STATE = {
   budgetList: [], // Part 5 — Settings panel-এর বাজেট সেকশনে cached
   entryHistory: [], // Part 5 — এন্ট্রি tab-এর History view-এ cached
   editingCrmType: null, // 'client' | 'pipeline' | 'project' — for FAB context
-  newsLoadedOnce: false  // News tab-এ একবারের বেশি auto-fetch না করার জন্য (Part 3)
+  newsLoadedOnce: false,  // News tab-এ একবারের বেশি auto-fetch না করার জন্য (Part 3)
+  detailedEntries: null,  // cached for dashboard breakdown
+  dashboardData: null     // cached dashboard summary
 };
 
 var TYPE_CONFIG = {
@@ -2185,7 +2230,7 @@ function callBackend(payload, onSuccess, onError) {
 }
 
 // ════════════════════════════════════════════════════════════
-// TAB NAVIGATION
+// TAB NAVIGATION — with URL hash persistence
 // ════════════════════════════════════════════════════════════
 
 var TAB_SUBTITLES = {
@@ -2194,6 +2239,11 @@ var TAB_SUBTITLES = {
 };
 
 function switchTab(tabName) {
+  // Update URL hash
+  if (window.location.hash !== '#' + tabName) {
+    window.location.hash = tabName;
+  }
+
   STATE.currentTab = tabName;
 
   document.querySelectorAll('.tab-page').forEach(function (p) { p.classList.remove('active'); });
@@ -2213,6 +2263,27 @@ function switchTab(tabName) {
   if (tabName === 'news' && !STATE.newsLoadedOnce) { STATE.newsLoadedOnce = true; loadNewsBriefing(); }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Handle hash changes (back/forward)
+window.addEventListener('hashchange', function () {
+  var hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById('page-' + hash)) {
+    switchTab(hash);
+  }
+});
+
+// Read initial hash on load
+function initTabFromHash() {
+  var hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById('page-' + hash)) {
+    // But we need to trigger the tab switch without resetting hash
+    // We'll call switchTab which will set hash again (no loop)
+    switchTab(hash);
+  } else {
+    // Default to entry if no hash or invalid
+    switchTab('entry');
+  }
 }
 
 document.querySelectorAll('.nav-btn').forEach(function (btn) {
@@ -2498,15 +2569,8 @@ document.getElementById('addCategoryBtn').addEventListener('click', function () 
 });
 
 // ════════════════════════════════════════════════════════════
-// TAB 2 — DASHBOARD RENDERING
+// TAB 2 — DASHBOARD RENDERING (with detailed entries & notes)
 // ════════════════════════════════════════════════════════════
-//
-// নোট: Part 1-এর Code.gs ইতিমধ্যে Dashboard tab-এ পুরো summary লিখে রাখে
-// (refreshDashboard ফাংশন)। এই PWA-তে আমরা সরাসরি Sheets API দিয়ে Dashboard
-// tab পড়তে পারি না (Apps Script Web App শুধু doPost/doGet handle করে),
-// তাই Dashboard ভিউ এখন সরাসরি doGet(?action=get_dashboard) থেকে real
-// সংখ্যা fetch করে দেখায় — Code.gs-এর computeMonthlySummary() ব্যবহার করেই
-// এই সংখ্যা আসে, তাই Google Sheet-এর Dashboard tab আর এই view সবসময় মিলবে।
 
 var monthLabelsBn = ["", "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
   "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
@@ -2526,9 +2590,6 @@ function fetchFromBackend(queryString, onSuccess, onError) {
   }
   // ⚠️ redirect:'follow' আবশ্যক — Apps Script doGet() response সবসময়
   // script.google.com → script.googleusercontent.com redirect হয়ে আসে।
-  // এটা ছাড়া GET request silently fail করতে পারে (callBackend()-এর POST
-  // call-এ এই same redirect handling আগে থেকেই ছিল, কিন্তু GET helper
-  // তৈরি করার সময় এটা ভুলে বাদ পড়ে গিয়েছিল — Part 5-এর প্রকৃত bug)।
   fetch(WEB_APP_URL + '?' + queryString, { method: 'GET', redirect: 'follow' })
     .then(function (res) { return res.json(); })
     .then(function (data) {
@@ -2542,9 +2603,11 @@ function fetchFromBackend(queryString, onSuccess, onError) {
 }
 
 function renderDashboard() {
+  // First fetch summary
   fetchFromBackend('action=get_dashboard', function (d) {
-    STATE.lastDashboardData = d;
+    STATE.dashboardData = d;
 
+    // Update summary cards
     document.getElementById('dashboardMonthLabel').textContent = d.monthLabel;
 
     var net = d.netBalance;
@@ -2565,31 +2628,83 @@ function renderDashboard() {
     document.getElementById('statTotalSavings').textContent = formatBDT(d.totalSavingsBDT);
     document.getElementById('savingsRateText').textContent = 'Savings Rate: ' + d.savingsRatePct + '%';
 
-    renderCategoryBreakdown('expenseCategoryBreakdown', d.expenseByCategory, 'এই মাসে কোনো খরচের এন্ট্রি নেই');
-    renderCategoryBreakdown('incomeCategoryBreakdown', d.incomeByCategory, 'এই মাসে কোনো আয়ের এন্ট্রি নেই');
-
+    // Pipeline snapshot
     document.getElementById('dashActiveClients').textContent = d.crm.activeClients;
     document.getElementById('dashMRR').textContent = formatBDT(d.crm.mrrBDT);
     document.getElementById('dashOpenLeads').textContent = d.crm.openLeads;
     document.getElementById('dashPipelineValue').textContent = formatBDT(d.crm.pipelineValueBDT);
     document.getElementById('dashAtRisk').textContent = d.crm.atRiskClients;
+
+    // Now fetch detailed entries for the current month
+    fetchFromBackend('action=get_entry_list&limit=100', function (entries) {
+      var currentMonthKey = getCurrentMonthKey();
+      // Filter entries for current month
+      var monthEntries = entries.filter(function (e) { return e["Month Key"] === currentMonthKey; });
+      STATE.detailedEntries = monthEntries;
+
+      // Group by type and then category
+      var grouped = { expense: {}, income: {}, savings: {} };
+      monthEntries.forEach(function (e) {
+        var type = e["ধরন"];
+        var cat = e["ক্যাটাগরি"] || "অজানা";
+        var key = type === "খরচ" ? "expense" : (type === "আয়" ? "income" : "savings");
+        if (!grouped[key][cat]) grouped[key][cat] = [];
+        grouped[key][cat].push(e);
+      });
+
+      // Render each breakdown
+      renderDetailedCategory('expenseCategoryBreakdown', grouped.expense, 'এই মাসে কোনো খরচের এন্ট্রি নেই');
+      renderDetailedCategory('incomeCategoryBreakdown', grouped.income, 'এই মাসে কোনো আয়ের এন্ট্রি নেই');
+      renderDetailedCategory('savingsCategoryBreakdown', grouped.savings, 'এই মাসে কোনো সঞ্চয়ের এন্ট্রি নেই');
+    });
   });
 }
 
-function renderCategoryBreakdown(containerId, categoryObj, emptyText) {
+function getCurrentMonthKey() {
+  var d = new Date();
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1);
+}
+
+function renderDetailedCategory(containerId, categoryGroup, emptyText) {
   var container = document.getElementById(containerId);
-  var keys = Object.keys(categoryObj || {});
-  if (keys.length === 0) {
+  var cats = Object.keys(categoryGroup);
+  if (cats.length === 0) {
     container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">' + emptyText + '</div></div>';
     return;
   }
-  keys.sort(function (a, b) { return categoryObj[b] - categoryObj[a]; });
+
   var html = '';
-  keys.forEach(function (cat) {
-    html += '<div class="cat-breakdown-row"><span class="cat-breakdown-name">' + cat + '</span>' +
-      '<span class="cat-breakdown-amount">' + formatBDT(categoryObj[cat]) + '</span></div>';
+  cats.forEach(function (cat) {
+    var entries = categoryGroup[cat];
+    var total = entries.reduce(function (sum, e) { return sum + (parseFloat(e["পরিমাণ (BDT সমান)"]) || 0); }, 0);
+    html += '<div class="detail-category-group">' +
+      '<div class="category-total">' + cat + ' — ' + formatBDT(total) + '</div>';
+    entries.forEach(function (e) {
+      var amt = parseFloat(e["পরিমাণ"]) || 0;
+      var currency = e["মুদ্রা"] || 'BDT';
+      var amtLabel = currency === 'USD' ? '$' + Math.round(amt).toLocaleString('en-US') : formatBDT(amt);
+      var note = e["খরচের বিবরণ"] || e["আয়ের উৎস বিস্তারিত"] || e["সঞ্চয়ের লক্ষ্য"] || '';
+      html += '<div class="detail-entry">' +
+        '<div class="entry-top">' +
+        '<span class="entry-date">' + (e["তারিখ"] || '') + '</span>' +
+        '<span class="entry-amount">' + amtLabel + '</span>' +
+        '</div>' +
+        (note ? '<div class="entry-note">' + escapeHtml(note) + '</div>' : '') +
+        '</div>';
+    });
+    html += '</div>';
   });
   container.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 document.getElementById('refreshDashboardBtn').addEventListener('click', function () {
@@ -3515,7 +3630,8 @@ function initApp() {
     populateClientLinkDropdown();
   });
 
-  switchTab('entry');
+  // Initialize tab based on URL hash
+  initTabFromHash();
 }
 
 // ════════════════════════════════════════════════════════════
